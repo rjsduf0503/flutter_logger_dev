@@ -1,16 +1,16 @@
 import 'dart:collection';
 
 import '../logger.dart';
-import './logoutput.dart';
+import 'log_output.dart';
 
-class CustomOutput extends LogOutput {
+class CustomLogOutput extends LogOutput {
   final int bufferSize;
 
   final LogOutput? secondOutput;
 
   final ListQueue<OutputEvent> buffer;
 
-  CustomOutput({this.bufferSize = 100, this.secondOutput})
+  CustomLogOutput({this.bufferSize = 100, this.secondOutput})
       : buffer = ListQueue(bufferSize);
 
   @override
