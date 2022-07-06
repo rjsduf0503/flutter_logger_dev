@@ -31,7 +31,7 @@ class Routing extends StatelessWidget {
   Widget getStackBody() {
     switch (item) {
       case "App Log":
-        return const AppLog();
+        return AppLog();
       case "Client Log":
         return const ClientLog();
       default:
