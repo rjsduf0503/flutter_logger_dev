@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'components/fab.dart' as fab;
 
-void main() {
+void main() async {
   runApp(const App());
 }
 

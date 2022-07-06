@@ -1,19 +1,35 @@
 import 'package:flutter/material.dart';
+import '../../components/logger/custom_logcontroller.dart';
+
+CustomLogController customLogController = CustomLogController();
 
 class AppLog extends StatelessWidget {
-  const AppLog({Key? key}) : super(key: key);
+  AppLog({Key? key}) : super(key: key);
+  void testLogging() {
+    customLogController.logger.v('verbose test');
+    customLogController.logger.e('error test');
+    customLogController.logger.d('debug test');
+    customLogController.logger.i('info test');
+    customLogController.logger.w('warning test');
+  }
 
+  var buffer = customLogController.getBuffer();
   @override
   Widget build(BuildContext context) {
-    return Column(
+    testLogging();
+    return ListView(
       children: [
-        Text('App Log'),
-        RaisedButton(
-          onPressed: () {
-            // 눌렀을 때 첫 번째 route로 되돌아 갑니다.
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
+        Column(
+          children: buffer.map((element) {
+            return Column(
+              children: [
+                // Text(element.level.name),
+                ...element.lines.map((e) {
+                  return Text(e);
+                }),
+              ],
+            );
+          }).toList(),
         ),
       ],
     );
