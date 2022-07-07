@@ -5,11 +5,11 @@ import 'printer/custom_log_printer.dart';
 import 'dart:developer' as developer;
 
 enum Level {
-  verbose,
-  debug,
   info,
   warning,
   error,
+  debug,
+  verbose,
   nothing,
 }
 
