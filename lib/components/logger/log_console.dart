@@ -1,5 +1,3 @@
-// part of logger_flutter;
-
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
@@ -53,7 +51,7 @@ class _LogConsoleState extends State<LogConsole> {
   final _scrollController = ScrollController();
   final _filterController = TextEditingController();
 
-  Level _filterLevel = Level.verbose;
+  Level _filterLevel = Level.nothing;
   double _logFontSize = 14;
 
   var _currentId = 0;
@@ -98,7 +96,9 @@ class _LogConsoleState extends State<LogConsole> {
 
   void _refreshFilter() {
     var newFilteredBuffer = _renderedBuffer.where((it) {
-      var logLevelMatches = it.level.index >= _filterLevel.index;
+      var logLevelMatches = _filterLevel.name == 'nothing'
+          ? it.level.index <= _filterLevel.index
+          : it.level.index == _filterLevel.index;
       if (!logLevelMatches) {
         return false;
       } else if (_filterController.text.isNotEmpty) {
@@ -256,6 +256,10 @@ class _LogConsoleState extends State<LogConsole> {
           DropdownButton(
             value: _filterLevel,
             items: const [
+              DropdownMenuItem(
+                value: Level.nothing,
+                child: Text("ALL"),
+              ),
               DropdownMenuItem(
                 value: Level.verbose,
                 child: Text("VERBOSE"),
