@@ -1,11 +1,13 @@
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/components/app_log/app_log_copy_button.dart';
 
 import '../logger/logger.dart';
 import 'ansi_parser.dart';
 
 ListQueue<OutputEvent> _outputEventBuffer = ListQueue();
+ListQueue<OutputEvent> _outputEventBufferWithoutPrefix = ListQueue();
 int _bufferSize = 100;
 bool _initialized = false;
 
@@ -27,6 +29,12 @@ class LogConsole extends StatefulWidget {
       }
       _outputEventBuffer.add(e);
     });
+    Logger.addOutputListenerWithoutPrefix((e) {
+      if (_outputEventBufferWithoutPrefix.length == bufferSize) {
+        _outputEventBufferWithoutPrefix.removeFirst();
+      }
+      _outputEventBufferWithoutPrefix.add(e);
+    });
   }
 
   @override
@@ -44,9 +52,12 @@ class RenderedEvent {
 
 class _LogConsoleState extends State<LogConsole> {
   late OutputCallback _callback;
+  late OutputCallbackWithoutPrefix _callbackWithoutPrefix;
 
   final ListQueue<RenderedEvent> _renderedBuffer = ListQueue();
+  final ListQueue<RenderedEvent> _renderedBufferWithoutPrefix = ListQueue();
   List<RenderedEvent> _filteredBuffer = [];
+  List<RenderedEvent> _filteredBufferWithoutPrefix = [];
 
   final _scrollController = ScrollController();
   final _filterController = TextEditingController();
@@ -71,7 +82,17 @@ class _LogConsoleState extends State<LogConsole> {
       _refreshFilter();
     };
 
+    _callbackWithoutPrefix = (e) {
+      if (_renderedBufferWithoutPrefix.length == _bufferSize) {
+        _renderedBufferWithoutPrefix.removeFirst();
+      }
+
+      _renderedBufferWithoutPrefix.add(_renderEvent(e));
+      _refreshFilter();
+    };
+
     Logger.addOutputListener(_callback);
+    Logger.addOutputListener(_callbackWithoutPrefix);
 
     _scrollController.addListener(() {
       if (!_scrollListenerEnabled) return;
@@ -91,11 +112,16 @@ class _LogConsoleState extends State<LogConsole> {
     for (var event in _outputEventBuffer) {
       _renderedBuffer.add(_renderEvent(event));
     }
+    _renderedBufferWithoutPrefix.clear();
+    for (var event in _outputEventBufferWithoutPrefix) {
+      _renderedBufferWithoutPrefix.add(_renderEvent(event));
+    }
     _refreshFilter();
   }
 
-  void _refreshFilter() {
-    var newFilteredBuffer = _renderedBuffer.where((it) {
+  List<RenderedEvent> getFilteredBuffer(
+      ListQueue<RenderedEvent> renderedBuffer) {
+    return renderedBuffer.where((it) {
       var logLevelMatches = _filterLevel.name == 'nothing'
           ? it.level.index <= _filterLevel.index
           : it.level.index == _filterLevel.index;
@@ -108,8 +134,15 @@ class _LogConsoleState extends State<LogConsole> {
         return true;
       }
     }).toList();
+  }
+
+  void _refreshFilter() {
+    var newFilteredBuffer = getFilteredBuffer(_renderedBuffer);
+    var newFilteredBufferWithoutPrefix =
+        getFilteredBuffer(_renderedBufferWithoutPrefix);
     setState(() {
       _filteredBuffer = newFilteredBuffer;
+      _filteredBufferWithoutPrefix = newFilteredBufferWithoutPrefix;
     });
 
     if (_followBottom) {
@@ -180,10 +213,22 @@ class _LogConsoleState extends State<LogConsole> {
             controller: _scrollController,
             itemBuilder: (context, index) {
               var logEntry = _filteredBuffer[index];
-              return Text.rich(
-                logEntry.span,
-                key: Key(logEntry.id.toString()),
-                style: TextStyle(fontSize: _logFontSize),
+              var logEntryWithoutPrefix = _filteredBufferWithoutPrefix[index];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Stack(
+                    children: [
+                      Text.rich(
+                        logEntry.span,
+                        key: Key(logEntry.id.toString()),
+                        style: TextStyle(fontSize: _logFontSize),
+                      ),
+                      AppLogCopyButton(
+                          logEntry: logEntryWithoutPrefix, dark: widget.dark, size: _logFontSize),
+                    ],
+                  ),
+                ],
               );
             },
             itemCount: _filteredBuffer.length,
@@ -323,6 +368,7 @@ class _LogConsoleState extends State<LogConsole> {
   @override
   void dispose() {
     Logger.removeOutputListener(_callback);
+    Logger.removeOutputListener(_callbackWithoutPrefix);
     super.dispose();
   }
 }

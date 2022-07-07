@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'components/logger/log_console.dart';
 import 'components/fab.dart' as fab;
 import 'components/logger/logger.dart';
-import 'components/logger/output/custom_log_output.dart';
+// import 'components/logger/output/custom_log_output.dart';
 
-final CustomLogOutput customOutput = CustomLogOutput();
-Logger logger = Logger(output: customOutput);
+// final CustomLogOutput customOutput = CustomLogOutput();
+Logger logger = Logger();
 
 void main() async {
   LogConsole.init();

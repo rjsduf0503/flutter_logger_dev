@@ -97,7 +97,7 @@ class CustomLogPrinter extends LogPrinter {
   }
 
   @override
-  List<String> log(LogEvent event) {
+  List<String> log(LogEvent event, bool isWithoutPrefix) {
     var messageStr = stringifyMessage(event.message);
 
     String? stackTraceStr;
@@ -119,6 +119,7 @@ class CustomLogPrinter extends LogPrinter {
     List<String> logForDebugConsole = _formatAndPrint(
       event.level,
       messageStr,
+      isWithoutPrefix,
       timeStr,
       errorStr,
       stackTraceStr,
@@ -215,19 +216,27 @@ class CustomLogPrinter extends LogPrinter {
     }
   }
 
-  AnsiColor _getLevelColor(Level level) {
-    if (colors) {
-      return levelColors[level]!;
-    } else {
+  AnsiColor _getLevelColor(Level level, bool isWithoutPrefix) {
+    if (isWithoutPrefix) {
       return AnsiColor.none();
+    } else {
+      if (colors) {
+        return levelColors[level]!;
+      } else {
+        return AnsiColor.none();
+      }
     }
   }
 
-  AnsiColor _getErrorColor(Level level) {
-    if (colors) {
-      return levelColors[Level.error]!.toBg();
-    } else {
+  AnsiColor _getErrorColor(Level level, bool isWithoutPrefix) {
+    if (isWithoutPrefix) {
       return AnsiColor.none();
+    } else {
+      if (colors) {
+        return levelColors[Level.error]!.toBg();
+      } else {
+        return AnsiColor.none();
+      }
     }
   }
 
@@ -242,17 +251,18 @@ class CustomLogPrinter extends LogPrinter {
   List<String> _formatAndPrint(
     Level level,
     String message,
+    bool isWithoutPrefix,
     String? time,
     String? error,
     String? stacktrace,
   ) {
     List<String> buffer = [];
     var verticalLineAtLevel = (includeBox[level]!) ? (verticalLine + ' ') : '';
-    var color = _getLevelColor(level);
+    var color = _getLevelColor(level, isWithoutPrefix);
     if (includeBox[level]!) buffer.add(color(_topBorder));
 
     if (error != null) {
-      var errorColor = _getErrorColor(level);
+      var errorColor = _getErrorColor(level, isWithoutPrefix);
       for (var line in error.split('\n')) {
         buffer.add(
           color(verticalLineAtLevel) +
@@ -285,7 +295,7 @@ class CustomLogPrinter extends LogPrinter {
     return buffer;
   }
 
-  List<String> _formatAndPrintForWidget(
+  List<String> _formatAndPrintWithoutPrefix(
     Level level,
     String message,
     String? time,
@@ -293,21 +303,34 @@ class CustomLogPrinter extends LogPrinter {
     String? stacktrace,
   ) {
     List<String> buffer = [];
+    var verticalLineAtLevel = (includeBox[level]!) ? (verticalLine + ' ') : '';
+    if (includeBox[level]!) buffer.add(_topBorder);
+
+    if (error != null) {
+      for (var line in error.split('\n')) {
+        buffer.add(verticalLineAtLevel + line);
+      }
+      if (includeBox[level]!) buffer.add(_middleBorder);
+    }
 
     if (stacktrace != null) {
       for (var line in stacktrace.split('\n')) {
-        buffer.add(line);
+        buffer.add('$verticalLineAtLevel$line');
       }
+      if (includeBox[level]!) buffer.add(_middleBorder);
     }
 
     if (time != null) {
-      buffer.add(time);
+      buffer.add('$verticalLineAtLevel$time');
+      if (includeBox[level]!) buffer.add(_middleBorder);
     }
 
+    var emoji = _getEmoji(level);
     for (var line in message.split('\n')) {
-      var prefix = levelPrefixes[level]!;
-      buffer.add('$prefix $line');
+      buffer.add('$verticalLineAtLevel$emoji$line');
     }
+    if (includeBox[level]!) buffer.add(_bottomBorder);
+
     return buffer;
   }
 }
