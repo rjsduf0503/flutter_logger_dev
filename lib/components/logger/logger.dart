@@ -1,7 +1,7 @@
-import './output/logoutput.dart';
-import './output/custom_logoutput.dart';
-import './printer/logprint.dart';
-import './printer/custom_logprint.dart';
+import 'output/log_output.dart';
+import 'output/custom_log_output.dart';
+import 'printer/log_printer.dart';
+import 'printer/custom_log_printer.dart';
 import 'dart:developer' as developer;
 
 enum Level {
@@ -32,12 +32,12 @@ class OutputEvent {
 @Deprecated('Use a custom LogFilter instead')
 typedef LogCallback = void Function(LogEvent event);
 
-@Deprecated('Use a custom LogOutput instead')
+// @Deprecated('Use a custom LogOutput instead')
 typedef OutputCallback = void Function(OutputEvent event);
 
 class Logger {
   static Level level = Level.verbose;
-
+  static final Set<OutputCallback> _outputCallbacks = Set();
   // final LogFilter _filter;
   final LogPrinter _printer;
   final LogOutput _output;
@@ -50,8 +50,8 @@ class Logger {
     Level? level,
   })  :
         // _filter = filter ?? DevelopmentFilter(),
-        _printer = printer ?? CustomPrinter(),
-        _output = output ?? CustomOutput() {
+        _printer = printer ?? CustomLogPrinter(),
+        _output = output ?? CustomLogOutput() {
     // _filter.init();
     // _filter.level = level ?? Logger.level;
     _printer.init();
@@ -94,22 +94,23 @@ class Logger {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
     var logEvent = LogEvent(level, message, error, stackTrace);
-    // if (_filter.shouldLog(logEvent)) {
-    List<List<String>> output = _printer.log(logEvent);
+
+    List<String> output = _printer.log(logEvent);
 
     if (output.isNotEmpty) {
+      var outputEvent = OutputEvent(level, output);
+      for (var callback in _outputCallbacks) {
+        callback(outputEvent);
+      }
       try {
-        for (var item in output[0]) {
+        for (var item in output) {
           developer.log(item);
         }
-        // developer.log(output);
-        _output.output(OutputEvent(level, output[1]));
       } catch (e, s) {
         print(e);
         print(s);
       }
     }
-    // }
   }
 
   void close() {
@@ -117,5 +118,13 @@ class Logger {
     // _filter.destroy();
     _printer.destroy();
     _output.destroy();
+  }
+
+  static void addOutputListener(OutputCallback callback) {
+    _outputCallbacks.add(callback);
+  }
+
+  static void removeOutputListener(OutputCallback callback) {
+    _outputCallbacks.remove(callback);
   }
 }

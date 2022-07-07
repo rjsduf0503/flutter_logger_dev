@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import '../logger.dart';
-import './logprint.dart';
+import 'log_printer.dart';
 import '../colorizing.dart';
 
-class CustomPrinter extends LogPrinter {
+class CustomLogPrinter extends LogPrinter {
   static final levelPrefixes = {
     Level.verbose: '[Verbose]',
     Level.debug: '[Debug]',
@@ -14,7 +14,9 @@ class CustomPrinter extends LogPrinter {
   };
 
   static const topLeftCorner = '┌';
+  static const topRightCorner = '┐';
   static const bottomLeftCorner = '└';
+  static const bottomRightCorner = '┘';
   static const middleCorner = '├';
   static const verticalLine = '│';
   static const doubleDivider = '─';
@@ -22,7 +24,7 @@ class CustomPrinter extends LogPrinter {
 
   static final levelColors = {
     Level.verbose: AnsiColor.fg(AnsiColor.grey(0.5)),
-    Level.debug: AnsiColor.none(),
+    Level.debug: AnsiColor.fg(190),
     Level.info: AnsiColor.fg(12),
     Level.warning: AnsiColor.fg(208),
     Level.error: AnsiColor.fg(196),
@@ -31,8 +33,8 @@ class CustomPrinter extends LogPrinter {
   static final levelEmojis = {
     Level.verbose: '',
     Level.debug: '🐛 ',
-    Level.info: '💡 ',
-    Level.warning: '⚠️ ',
+    Level.info: '❗️ ',
+    Level.warning: '🚨 ',
     Level.error: '⛔ ',
   };
 
@@ -65,11 +67,11 @@ class CustomPrinter extends LogPrinter {
   String _middleBorder = '';
   String _bottomBorder = '';
 
-  CustomPrinter({
+  CustomLogPrinter({
     this.stackTraceBeginIndex = 0,
     this.methodCount = 2,
     this.errorMethodCount = 8,
-    this.lineLength = 130,
+    this.lineLength = 110,
     this.colors = true,
     this.printEmojis = true,
     this.printTime = false,
@@ -85,9 +87,9 @@ class CustomPrinter extends LogPrinter {
       singleDividerLine.write(singleDivider);
     }
 
-    _topBorder = '$topLeftCorner$doubleDividerLine';
+    _topBorder = '$topLeftCorner$doubleDividerLine$topRightCorner';
     _middleBorder = '$middleCorner$singleDividerLine';
-    _bottomBorder = '$bottomLeftCorner$doubleDividerLine';
+    _bottomBorder = '$bottomLeftCorner$doubleDividerLine$bottomRightCorner';
 
     includeBox = {};
     Level.values.forEach((l) => includeBox[l] = !noBoxingByDefault);
@@ -95,7 +97,7 @@ class CustomPrinter extends LogPrinter {
   }
 
   @override
-  List<List<String>> log(LogEvent event) {
+  List<String> log(LogEvent event) {
     var messageStr = stringifyMessage(event.message);
 
     String? stackTraceStr;
@@ -122,17 +124,7 @@ class CustomPrinter extends LogPrinter {
       stackTraceStr,
     );
 
-    List<String> logForWidget = _formatAndPrintForWidget(
-      event.level,
-      messageStr,
-      timeStr,
-      errorStr,
-      stackTraceStr,
-    );
-
-    List<List<String>> Logs = [logForDebugConsole, logForWidget];
-
-    return Logs;
+    return logForDebugConsole;
   }
 
   String? formatStackTrace(StackTrace? stackTrace, int methodCount) {

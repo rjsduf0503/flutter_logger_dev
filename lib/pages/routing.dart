@@ -42,15 +42,7 @@ class Routing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBodyBehindAppBar: true,
-      extendBody: true,
-      appBar: AppBar(
-        // leading: BackButton(color: Colors.black),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
-        title: Text(item),
-      ),
+      // extendBody: true,
       body: getStackBody(),
     );
   }
