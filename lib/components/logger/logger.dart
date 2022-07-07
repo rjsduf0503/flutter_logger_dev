@@ -29,31 +29,21 @@ class OutputEvent {
   OutputEvent(this.level, this.lines);
 }
 
-@Deprecated('Use a custom LogFilter instead')
-typedef LogCallback = void Function(LogEvent event);
-
-// @Deprecated('Use a custom LogOutput instead')
 typedef OutputCallback = void Function(OutputEvent event);
 
 class Logger {
-  static Level level = Level.verbose;
-  static final Set<OutputCallback> _outputCallbacks = Set();
-  // final LogFilter _filter;
+  static Level level = Level.nothing;
+  static final Set<OutputCallback> _outputCallbacks = {};
   final LogPrinter _printer;
   final LogOutput _output;
   bool _active = true;
 
   Logger({
-    // LogFilter? filter,
     LogPrinter? printer,
     LogOutput? output,
     Level? level,
-  })  :
-        // _filter = filter ?? DevelopmentFilter(),
-        _printer = printer ?? CustomLogPrinter(),
+  })  : _printer = printer ?? CustomLogPrinter(),
         _output = output ?? CustomLogOutput() {
-    // _filter.init();
-    // _filter.level = level ?? Logger.level;
     _printer.init();
     _output.init();
   }
@@ -94,7 +84,6 @@ class Logger {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
     var logEvent = LogEvent(level, message, error, stackTrace);
-
     List<String> output = _printer.log(logEvent);
 
     if (output.isNotEmpty) {
@@ -115,7 +104,6 @@ class Logger {
 
   void close() {
     _active = false;
-    // _filter.destroy();
     _printer.destroy();
     _output.destroy();
   }
