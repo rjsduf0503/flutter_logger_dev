@@ -1,5 +1,5 @@
-import 'output/log_output.dart';
-import 'output/custom_log_output.dart';
+// import 'output/log_output.dart';
+// import 'output/custom_log_output.dart';
 import 'printer/log_printer.dart';
 import 'printer/custom_log_printer.dart';
 import 'dart:developer' as developer;
@@ -30,23 +30,20 @@ class OutputEvent {
 }
 
 typedef OutputCallback = void Function(OutputEvent event);
+typedef OutputCallbackWithoutPrefix = void Function(OutputEvent event);
 
 class Logger {
   static Level level = Level.nothing;
   static final Set<OutputCallback> _outputCallbacks = {};
+  static final Set<OutputCallbackWithoutPrefix> _outputCallbacksWithoutPrefix =
+      {};
   final LogPrinter _printer;
-  final LogOutput _output;
   bool _active = true;
 
   Logger({
     LogPrinter? printer,
-    LogOutput? output,
     Level? level,
-  })  : _printer = printer ?? CustomLogPrinter(),
-        _output = output ?? CustomLogOutput() {
-    _printer.init();
-    _output.init();
-  }
+  }) : _printer = printer ?? CustomLogPrinter();
 
   /// Log a message at level [Level.verbose].
   void v(dynamic message, [dynamic error, StackTrace? stackTrace]) {
@@ -84,12 +81,17 @@ class Logger {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
     var logEvent = LogEvent(level, message, error, stackTrace);
-    List<String> output = _printer.log(logEvent);
+    List<String> output = _printer.log(logEvent, false);
+    List<String> outputWithoutPrefix = _printer.log(logEvent, true);
 
     if (output.isNotEmpty) {
       var outputEvent = OutputEvent(level, output);
+      var outputEventWithoutPrefix = OutputEvent(level, outputWithoutPrefix);
       for (var callback in _outputCallbacks) {
         callback(outputEvent);
+      }
+      for (var callback in _outputCallbacksWithoutPrefix) {
+        callback(outputEventWithoutPrefix);
       }
       try {
         for (var item in output) {
@@ -105,7 +107,6 @@ class Logger {
   void close() {
     _active = false;
     _printer.destroy();
-    _output.destroy();
   }
 
   static void addOutputListener(OutputCallback callback) {
@@ -113,6 +114,16 @@ class Logger {
   }
 
   static void removeOutputListener(OutputCallback callback) {
-    _outputCallbacks.remove(callback);
+    _outputCallbacksWithoutPrefix.remove(callback);
+  }
+
+  static void addOutputListenerWithoutPrefix(
+      OutputCallbackWithoutPrefix callback) {
+    _outputCallbacksWithoutPrefix.add(callback);
+  }
+
+  static void removeOutputListenerWithoutPrefix(
+      OutputCallbackWithoutPrefix callback) {
+    _outputCallbacksWithoutPrefix.remove(callback);
   }
 }
