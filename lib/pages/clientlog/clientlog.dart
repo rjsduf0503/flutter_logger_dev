@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/components/client_log/client_log_console.dart';
 
 class ClientLog extends StatelessWidget {
   const ClientLog({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class ClientLog extends StatelessWidget {
           },
           child: Text('Go back!'),
         ),
+        ClientLogConsole(),
       ],
     );
   }

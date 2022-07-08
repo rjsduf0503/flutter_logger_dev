@@ -1,16 +1,18 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/components/client_log/client_log_console.dart';
+import 'package:flutter_logger/components/client_log/client_logger.dart';
 import 'components/logger/log_console.dart';
 import 'components/fab.dart' as fab;
 import 'components/logger/logger.dart';
-// import 'components/logger/output/custom_log_output.dart';
 
-// final CustomLogOutput customOutput = CustomLogOutput();
 Logger logger = Logger();
+ClientLogger clientLogger = ClientLogger();
 
 void main() async {
   LogConsole.init();
+  ClientLogConsole.init();
   Timer(Duration(seconds: 0), () {
     logger.e('error test');
     logger.v('verbose test');
@@ -22,6 +24,9 @@ void main() async {
     logger.d('debug test');
     logger.i('info test');
     logger.w('warning test');
+    clientLogger.get('/users/2');
+    clientLogger.post('/users', data: {"name": "morpheus", "job": "leader"});
+    clientLogger.post('/register', queryParameters: {"email": "sydney@fife"});
   });
   // Timer.periodic(Duration(seconds: 30), (timer) {
   //   logger.e('error test');

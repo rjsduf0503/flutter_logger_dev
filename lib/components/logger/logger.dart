@@ -114,7 +114,7 @@ class Logger {
   }
 
   static void removeOutputListener(OutputCallback callback) {
-    _outputCallbacksWithoutPrefix.remove(callback);
+    _outputCallbacks.remove(callback);
   }
 
   static void addOutputListenerWithoutPrefix(
