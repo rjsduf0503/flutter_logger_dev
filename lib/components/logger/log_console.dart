@@ -314,16 +314,16 @@ class _LogConsoleState extends State<LogConsole> {
                 child: Text("DEBUG"),
               ),
               DropdownMenuItem(
-                value: Level.info,
-                child: Text("INFO"),
+                value: Level.error,
+                child: Text("ERROR"),
               ),
               DropdownMenuItem(
                 value: Level.warning,
                 child: Text("WARNING"),
               ),
               DropdownMenuItem(
-                value: Level.error,
-                child: Text("ERROR"),
+                value: Level.info,
+                child: Text("INFO"),
               ),
             ],
             onChanged: (value) {
