@@ -3,6 +3,10 @@ import 'dart:collection';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/client_log/client_logger.dart';
+import 'package:flutter_logger/components/client_log/content/client_log_contents.dart';
+import 'package:flutter_logger/components/client_log/header/client_log_header.dart';
+import 'package:flutter_logger/components/client_log/search/client_log_search.dart';
+import 'package:intl/intl.dart';
 
 ListQueue<ReturnValue> _outputEventBuffer = ListQueue();
 int _bufferSize = 100;
@@ -105,19 +109,34 @@ class _ClientLogConsoleState extends State<ClientLogConsole> {
 
   @override
   Widget build(BuildContext context) {
-    if (_filteredBuffer.isNotEmpty) {
-      _filteredBuffer
-          .asMap()
-          .entries
-          .map(((e) => {
-                print(e.value.request.requestTime),
-                print(e.value.request.method),
-                print(e.value.request.queryParameters),
-                print(e.value.request.body),
-                print(e.value.response.headers['date']),
-              }))
-          .toList();
-    }
-    return Text('TEST');
+    return MaterialApp(
+      theme: widget.dark
+          ? ThemeData(
+              brightness: Brightness.dark,
+              // colorScheme:
+              //     ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
+              accentColor: Colors.white,
+            )
+          : ThemeData(
+              brightness: Brightness.light,
+              // colorScheme:
+              // ColorScheme.fromSwatch().copyWith(secondary: Colors.black),
+              accentColor: Colors.black,
+            ),
+      home: Scaffold(
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ClientLogHeader(widget: widget),
+              Expanded(
+                child: ClientLogContents(filteredBuffer: _filteredBuffer),
+              ),
+              ClientLogSearch(widget: widget),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
