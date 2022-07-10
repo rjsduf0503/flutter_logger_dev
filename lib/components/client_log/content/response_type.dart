@@ -10,13 +10,14 @@ List<Color> _statusCodeColor = [
 ];
 
 class ResponseType extends StatelessWidget {
-  String responseType;
+  var responseType;
 
   ResponseType({Key? key, required this.responseType}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    int responseTypeColorIndex = int.parse(responseType.substring(0, 1));
+    int responseTypeColorIndex =
+        int.parse(responseType.toString().substring(0, 1));
     Color responseTypeColor = _statusCodeColor[responseTypeColorIndex];
     return Container(
       decoration: BoxDecoration(
@@ -26,7 +27,7 @@ class ResponseType extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(2.0),
         child: Text(
-          responseType,
+          responseType.toString(),
           style: const TextStyle(color: Colors.white),
         ),
       ),

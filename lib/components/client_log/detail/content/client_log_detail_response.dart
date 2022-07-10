@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ClientLogDetailResponse extends StatelessWidget {
-  const ClientLogDetailResponse({Key? key}) : super(key: key);
+  var response;
+  ClientLogDetailResponse({Key? key, required this.response}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var stringResponseTime = response.headers['date']?.first;
+    DateTime responseTime = DateTime.parse(stringResponseTime);
+    var hms = DateFormat.Hms().format(responseTime);
     return Card(
       margin: const EdgeInsets.all(12.0),
       elevation: 4.0,
@@ -16,7 +21,7 @@ class ClientLogDetailResponse extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('시간 '),
+                Text(hms),
                 GestureDetector(
                     onTap: () {
                       // todo: 클립보드에 복사
@@ -34,9 +39,9 @@ class ClientLogDetailResponse extends StatelessWidget {
   Widget _buildCardContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text('응답 헤더: '),
-        Text('응답 본문: '),
+      children: [
+        Text('응답 헤더: ${response.headers}'),
+        Text('응답 본문: ${response.data}'),
       ],
     );
   }

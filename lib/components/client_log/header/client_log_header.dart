@@ -3,7 +3,9 @@ import 'package:flutter_logger/components/logger/log_console.dart';
 
 class ClientLogHeader extends StatelessWidget {
   dynamic widget;
-  ClientLogHeader({Key? key, required this.widget}) : super(key: key);
+  var parentContext;
+  ClientLogHeader({Key? key, required this.widget, required this.parentContext})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +25,7 @@ class ClientLogHeader extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(parentContext);
             },
           ),
         ],

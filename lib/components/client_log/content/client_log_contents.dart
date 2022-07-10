@@ -14,12 +14,7 @@ class ClientLogContents extends StatelessWidget {
         shrinkWrap: true,
         itemBuilder: (context, index) {
           var logEntry = filteredBuffer[index];
-          var responseTime = logEntry.response.headers['date']?.first;
-          print(logEntry.request.requestTime); //DateTime
-          print(logEntry.request.requestTime.runtimeType);
-          print(responseTime); // String
-          print(responseTime.runtimeType);
-          return ClientLogContent();
+          return ClientLogContent(logEntry: logEntry);
         },
         itemCount: filteredBuffer.length,
       ),
