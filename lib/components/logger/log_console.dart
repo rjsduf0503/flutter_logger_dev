@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/app_log/app_log_copy_button.dart';
+import 'package:flutter_logger/environments.dart';
 
 import '../logger/logger.dart';
 import 'ansi_parser.dart';
@@ -283,6 +284,8 @@ class _LogConsoleState extends State<LogConsole> {
   }
 
   Widget _buildBottomBar() {
+    Level maxLevel = Environments.getMaxDisplayLevel;
+
     return LogBar(
       dark: widget.dark,
       child: Row(
@@ -302,31 +305,18 @@ class _LogConsoleState extends State<LogConsole> {
           const SizedBox(width: 20),
           DropdownButton(
             value: _filterLevel,
-            items: const [
+            items: [
               DropdownMenuItem(
                 value: Level.nothing,
                 child: Text("ALL"),
               ),
-              DropdownMenuItem(
-                value: Level.verbose,
-                child: Text("VERBOSE"),
-              ),
-              DropdownMenuItem(
-                value: Level.debug,
-                child: Text("DEBUG"),
-              ),
-              DropdownMenuItem(
-                value: Level.info,
-                child: Text("INFO"),
-              ),
-              DropdownMenuItem(
-                value: Level.warning,
-                child: Text("WARNING"),
-              ),
-              DropdownMenuItem(
-                value: Level.error,
-                child: Text("ERROR"),
-              ),
+              for (var item in Level.values)
+                if (item != Level.nothing)
+                  DropdownMenuItem(
+                    value: item,
+                    enabled: item.index <= maxLevel.index,
+                    child: Text(item.name.toUpperCase()),
+                  )
             ],
             onChanged: (value) {
               _filterLevel = value as Level;

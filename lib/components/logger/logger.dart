@@ -80,6 +80,8 @@ class Logger {
     } else if (level == Level.nothing) {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
+    if (level.index > Environments.getMaxDisplayLevel.index) return;
+
     var logEvent = LogEvent(level, message, error, stackTrace);
     List<String> output = _printer.log(logEvent, false);
     List<String> outputWithoutPrefix = _printer.log(logEvent, true);
