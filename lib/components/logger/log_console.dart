@@ -225,7 +225,9 @@ class _LogConsoleState extends State<LogConsole> {
                         style: TextStyle(fontSize: _logFontSize),
                       ),
                       AppLogCopyButton(
-                          logEntry: logEntryWithoutPrefix, dark: widget.dark, size: _logFontSize),
+                          logEntry: logEntryWithoutPrefix,
+                          dark: widget.dark,
+                          size: _logFontSize),
                     ],
                   ),
                 ],
