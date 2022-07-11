@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/pages/clientlog/client_log_detail.dart';
 import './applog/applog.dart';
 import './clientlog/clientlog.dart';
 
@@ -34,6 +35,8 @@ class Routing extends StatelessWidget {
         return AppLog();
       case "Client Log":
         return const ClientLog();
+      case "Client Log Detail":
+        return ClientLogDetail();
       default:
         return const SizedBox.shrink();
     }

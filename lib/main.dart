@@ -26,6 +26,7 @@ void main() async {
     logger.w('warning test');
     clientLogger.get('/users/2');
     clientLogger.post('/users', data: {"name": "morpheus", "job": "leader"});
+    clientLogger.post('/users', data: {"name": "morpheus", "job": "leader"});
     clientLogger.post('/register', queryParameters: {"email": "sydney@fife"});
   });
   // Timer.periodic(Duration(seconds: 30), (timer) {
