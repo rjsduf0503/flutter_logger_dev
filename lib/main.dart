@@ -25,6 +25,11 @@ void main() async {
     logger.i('info test');
     logger.w('warning test');
     clientLogger.get('/users/2');
+    clientLogger.get('/unknown/23');
+    clientLogger.get('/unknown/23');
+    clientLogger.get('/unknown/23');
+    clientLogger.get('/unknown/23');
+    clientLogger.get('/unknown/23');
     clientLogger.post('/users', data: {"name": "morpheus", "job": "leader"});
     clientLogger.post('/users', data: {"name": "morpheus", "job": "leader"});
     clientLogger.post('/register', queryParameters: {"email": "sydney@fife"});

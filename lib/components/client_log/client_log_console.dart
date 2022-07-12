@@ -6,6 +6,7 @@ import 'package:flutter_logger/components/client_log/client_logger.dart';
 import 'package:flutter_logger/components/client_log/content/client_log_contents.dart';
 import 'package:flutter_logger/components/client_log/header/client_log_header.dart';
 import 'package:flutter_logger/components/client_log/search/client_log_search.dart';
+import 'package:flutter_logger/components/logger/log_console.dart';
 
 ListQueue<ReturnValue> _outputEventBuffer = ListQueue();
 int _bufferSize = 100;
@@ -50,6 +51,8 @@ class _ClientLogConsoleState extends State<ClientLogConsole> {
   final ListQueue<RenderedEvent> _renderedBuffer = ListQueue();
   List<RenderedEvent> _filteredBuffer = [];
 
+  final _filterController = TextEditingController();
+
   var _currentId = 0;
 
   RenderedEvent _renderEvent(ReturnValue value) {
@@ -69,7 +72,14 @@ class _ClientLogConsoleState extends State<ClientLogConsole> {
 
   List<RenderedEvent> getFilteredBuffer(
       ListQueue<RenderedEvent> renderedBuffer) {
-    return renderedBuffer.toList();
+    return renderedBuffer.where((it) {
+      if (_filterController.text.isNotEmpty) {
+        var filterText = _filterController.text.toLowerCase();
+        return it.request.url.contains(filterText);
+      } else {
+        return true;
+      }
+    }).toList();
   }
 
   @override
@@ -132,7 +142,12 @@ class _ClientLogConsoleState extends State<ClientLogConsole> {
               Expanded(
                 child: ClientLogContents(filteredBuffer: _filteredBuffer),
               ),
-              ClientLogSearch(widget: widget),
+              // _buildClientLogSearch(),
+              ClientLogSearch(
+                widget: widget,
+                filterController: _filterController,
+                refreshFilter: _refreshFilter,
+              ),
             ],
           ),
         ),
