@@ -1,5 +1,7 @@
 // import 'output/log_output.dart';
 // import 'output/custom_log_output.dart';
+import 'package:flutter_logger/environments.dart';
+
 import 'printer/log_printer.dart';
 import 'printer/custom_log_printer.dart';
 import 'dart:developer' as developer;
