@@ -6,7 +6,6 @@ import 'package:flutter_logger/components/client_log/client_logger.dart';
 import 'package:flutter_logger/components/client_log/content/client_log_contents.dart';
 import 'package:flutter_logger/components/client_log/header/client_log_header.dart';
 import 'package:flutter_logger/components/client_log/search/client_log_search.dart';
-import 'package:intl/intl.dart';
 
 ListQueue<ReturnValue> _outputEventBuffer = ListQueue();
 int _bufferSize = 100;
@@ -129,7 +128,7 @@ class _ClientLogConsoleState extends State<ClientLogConsole> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              ClientLogHeader(widget: widget),
+              ClientLogHeader(parentContext: context, widget: widget),
               Expanded(
                 child: ClientLogContents(filteredBuffer: _filteredBuffer),
               ),

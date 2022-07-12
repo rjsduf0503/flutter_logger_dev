@@ -4,7 +4,8 @@ import 'package:flutter_logger/components/client_log/detail/content/client_log_d
 import 'package:flutter_logger/components/client_log/detail/header/client_log_detail_header.dart';
 
 class ClientLogDetailScreen extends StatelessWidget {
-  const ClientLogDetailScreen({Key? key}) : super(key: key);
+  var logEntry;
+  ClientLogDetailScreen({Key? key, required this.logEntry}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,16 +27,15 @@ class ClientLogDetailScreen extends StatelessWidget {
             ),
       home: Scaffold(
         body: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
+            shrinkWrap: true,
             children: <Widget>[
               ClientLogDetailHeader(
                 dark: isDarkMode,
                 parentContext: context,
               ),
-              ClientLogDetailRequest(),
-              ClientLogDetailResponse(),
-              // ClientLogSearch(widget: widget),
+              ClientLogDetailRequest(request: logEntry.request),
+              ClientLogDetailResponse(response: logEntry.response),
             ],
           ),
         ),

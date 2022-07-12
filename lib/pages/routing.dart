@@ -3,9 +3,10 @@ import 'package:flutter_logger/pages/clientlog/client_log_detail.dart';
 import './applog/applog.dart';
 import './clientlog/clientlog.dart';
 
-void handleRouting(context, item) {
+void handleRouting(context, item, {logEntry}) {
   Navigator.of(context).push(PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => Routing(item),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        Routing(item, logEntry),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = const Offset(1.0, 0.0);
       var end = Offset.zero;
@@ -26,8 +27,9 @@ void handleRouting(context, item) {
 
 class Routing extends StatelessWidget {
   final String item;
+  var logEntry;
 
-  const Routing(this.item, {Key? key}) : super(key: key);
+  Routing(this.item, this.logEntry, {Key? key}) : super(key: key);
 
   Widget getStackBody() {
     switch (item) {
@@ -36,7 +38,7 @@ class Routing extends StatelessWidget {
       case "Client Log":
         return const ClientLog();
       case "Client Log Detail":
-        return ClientLogDetail();
+        return ClientLogDetail(logEntry: logEntry);
       default:
         return const SizedBox.shrink();
     }

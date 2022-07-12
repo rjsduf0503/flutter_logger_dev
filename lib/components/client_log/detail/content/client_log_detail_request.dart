@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ClientLogDetailRequest extends StatelessWidget {
-  const ClientLogDetailRequest({Key? key}) : super(key: key);
+  var request;
+  ClientLogDetailRequest({Key? key, this.request}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +34,12 @@ class ClientLogDetailRequest extends StatelessWidget {
   }
 
   Widget _buildCardHeader() {
+    var requestTime = DateFormat.Hms().format(request.requestTime);
     return Row(
-      children: const [
-        Text('시간 '),
-        Text('method '),
-        Text('URI'),
+      children: [
+        Text(requestTime),
+        SizedBox(width: 5),
+        Text(request.method),
       ],
     );
   }
@@ -44,10 +47,11 @@ class ClientLogDetailRequest extends StatelessWidget {
   Widget _buildCardContent() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text('쿼리 파라미터: '),
-        Text('요청 헤더: '),
-        Text('요청 본문: '),
+      children: [
+        Text('주소: ${request.url}'),
+        Text('쿼리 파라미터: ${request.queryParameters}'),
+        Text('요청 헤더: ${request.header}'),
+        Text('요청 본문: ${request.body}'),
       ],
     );
   }
