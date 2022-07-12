@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class ClientLogDetailResponse extends StatelessWidget {
@@ -24,7 +25,9 @@ class ClientLogDetailResponse extends StatelessWidget {
                 Text(hms),
                 GestureDetector(
                     onTap: () {
-                      // todo: 클립보드에 복사
+                      Clipboard.setData(
+                          ClipboardData(text: stringfyResponse(response, hms)));
+                      _showClipboardAlert(context);
                     },
                     child: _buildCopyButton()),
               ],
@@ -40,7 +43,7 @@ class ClientLogDetailResponse extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('응답 헤더: ${response.headers}'),
+        Text('응답 헤더: ${{response.headers}}'),
         Text('응답 본문: ${response.data}'),
       ],
     );
@@ -50,5 +53,33 @@ class ClientLogDetailResponse extends StatelessWidget {
     return Row(
       children: const [Text('Copy '), Icon(Icons.copy)],
     );
+  }
+
+  void _showClipboardAlert(context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: const Text('Copied to clipboard.'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("Close"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  String stringfyResponse(response, hms) {
+    Object responseObject = {
+      'responseTime': hms,
+      'responseHeader': {response.headers},
+      'responseBody': response.data,
+    };
+    return responseObject.toString();
   }
 }
