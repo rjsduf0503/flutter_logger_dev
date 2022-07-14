@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import '../pages/routing.dart' as routing;
+import '../../routes/routing.dart' as routing;
 
-class CustomFAB extends StatelessWidget {
+class Fab extends StatelessWidget {
   final ValueNotifier<bool> isDialOpen;
 
-  const CustomFAB({Key? key, required this.isDialOpen}) : super(key: key);
+  const Fab({Key? key, required this.isDialOpen}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +21,14 @@ class CustomFAB extends StatelessWidget {
       spaceBetweenChildren: 10,
       children: [
         SpeedDialChild(
-            child: Icon(Icons.last_page_outlined),
+            child: const Icon(Icons.last_page_outlined),
             label: 'App Log',
-            // backgroundColor: Colors.blue,
             onTap: () {
               routing.handleRouting(context, 'App Log');
               print('App Log Tapped');
             }),
         SpeedDialChild(
-            child: Icon(Icons.public),
+            child: const Icon(Icons.public),
             label: 'Client Log',
             onTap: () {
               routing.handleRouting(context, 'Client Log');
