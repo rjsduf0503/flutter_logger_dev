@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../logger/log_console.dart';
+import 'package:flutter_logger/global_functions.dart';
+import 'package:flutter_logger/models/rendered_event_model.dart';
 
 class AppLogCopyButton extends StatelessWidget {
-  RenderedEvent logEntry;
+  RenderedAppLogEventModel logEntry;
   final bool dark;
   final double size;
   AppLogCopyButton(
@@ -24,7 +24,7 @@ class AppLogCopyButton extends StatelessWidget {
         child: InkWell(
           onTap: (() {
             Clipboard.setData(ClipboardData(text: logEntry.lowerCaseText));
-            _showClipboardAlert(context);
+            showClipboardAlert(context);
           }),
           child: Icon(Icons.copy,
               color: dark ? Colors.white : Colors.black, size: size * 2),
@@ -32,23 +32,4 @@ class AppLogCopyButton extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showClipboardAlert(context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        content: const Text('Copied to clipboard.'),
-        actions: <Widget>[
-          TextButton(
-            child: const Text("Close"),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      );
-    },
-  );
 }

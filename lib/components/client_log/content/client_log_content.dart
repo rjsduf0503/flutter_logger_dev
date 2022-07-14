@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/client_log/content/card_header.dart';
 import 'package:flutter_logger/components/client_log/content/detail_button.dart';
+import 'package:flutter_logger/routes/routing.dart';
 import 'package:intl/intl.dart';
-import '../../../pages/routing.dart' as routing;
 
 class ClientLogContent extends StatelessWidget {
-  var logEntry;
+  final dynamic logEntry;
   ClientLogContent({Key? key, required this.logEntry}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var stringResponseTime = logEntry.response.headers['date']?.first;
+    dynamic stringResponseTime = logEntry.response.headers['date']?.first;
     DateTime responseTime = DateTime.parse(stringResponseTime);
-    var requestTime = DateFormat.Hms().format(logEntry.request.requestTime);
-    var responseType = logEntry.response.statusCode;
-    var requestMethod = logEntry.request.method;
-    var timeDifference = responseTime.difference(logEntry.request.requestTime);
+    String requestTime = DateFormat.Hms().format(logEntry.request.requestTime);
+    dynamic responseType = logEntry.response.statusCode;
+    dynamic requestMethod = logEntry.request.method;
+    Duration timeDifference = responseTime.difference(logEntry.request.requestTime);
     return Card(
       margin: const EdgeInsets.all(12.0),
       elevation: 4.0,
@@ -28,15 +28,17 @@ class ClientLogContent extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CardHeader(
-                    requestTime: requestTime,
-                    responseType: responseType,
-                    requestMethod: requestMethod,
-                    timeDifference: timeDifference),
+                  requestTime: requestTime,
+                  responseType: responseType,
+                  requestMethod: requestMethod,
+                  timeDifference: timeDifference,
+                ),
                 GestureDetector(
                     onTap: () {
-                      routing.handleRouting(context, 'Client Log Detail', logEntry: logEntry);
+                      handleRouting(context, 'Client Log Detail',
+                          logEntry: logEntry);
                     },
-                    child: DetailButton()),
+                    child: const DetailButton()),
               ],
             ),
             const SizedBox(height: 12.0),

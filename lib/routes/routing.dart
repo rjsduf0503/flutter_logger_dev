@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/pages/clientlog/client_log_detail.dart';
-import './applog/applog.dart';
-import './clientlog/clientlog.dart';
+import 'package:flutter_logger/pages/app_log_screen.dart';
+import 'package:flutter_logger/pages/client_log/client_log_detail_screen.dart';
+import 'package:flutter_logger/pages/client_log/client_log_screen.dart';
 
 void handleRouting(context, item, {logEntry}) {
   Navigator.of(context).push(PageRouteBuilder(
@@ -34,11 +34,11 @@ class Routing extends StatelessWidget {
   Widget getStackBody() {
     switch (item) {
       case "App Log":
-        return AppLog();
+        return const AppLogScreen();
       case "Client Log":
-        return const ClientLog();
+        return const ClientLogScreen();
       case "Client Log Detail":
-        return ClientLogDetail(logEntry: logEntry);
+        return ClientLogDetailScreen(logEntry: logEntry);
       default:
         return const SizedBox.shrink();
     }
@@ -47,7 +47,6 @@ class Routing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // extendBody: true,
       body: getStackBody(),
     );
   }

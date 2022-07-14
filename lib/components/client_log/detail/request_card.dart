@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_logger/global_functions.dart';
 import 'package:intl/intl.dart';
 
-class ClientLogDetailRequest extends StatelessWidget {
-  var request;
-  ClientLogDetailRequest({Key? key, this.request}) : super(key: key);
+class RequestCard extends StatelessWidget {
+  final dynamic request;
+  RequestCard({Key? key, this.request}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +24,8 @@ class ClientLogDetailRequest extends StatelessWidget {
                 GestureDetector(
                     onTap: () {
                       Clipboard.setData(
-                          ClipboardData(text: stringfyRequest(request)));
-                      _showClipboardAlert(context);
+                          ClipboardData(text: stringfyHttpValue(request)));
+                      showClipboardAlert(context);
                     },
                     child: _buildCopyButton()),
               ],
@@ -41,7 +42,7 @@ class ClientLogDetailRequest extends StatelessWidget {
     return Row(
       children: [
         Text(requestTime),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
         Text(request.method),
       ],
     );
@@ -63,36 +64,5 @@ class ClientLogDetailRequest extends StatelessWidget {
     return Row(
       children: const [Text('Copy '), Icon(Icons.copy)],
     );
-  }
-
-  void _showClipboardAlert(context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: const Text('Copied to clipboard.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Close"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  String stringfyRequest(request) {
-    Object requestObject = {
-      'requestTime': DateFormat.Hms().format(request.requestTime),
-      'reuqestMethod': request.method,
-      'requestUri': request.url,
-      'queryParameters': request.queryParameters,
-      'requestHeader': request.header,
-      'requestBody': request.body,
-    };
-    return requestObject.toString();
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_logger/global_functions.dart';
 import 'package:intl/intl.dart';
 
-class ClientLogDetailResponse extends StatelessWidget {
-  var response;
-  ClientLogDetailResponse({Key? key, required this.response}) : super(key: key);
+class ResponseCard extends StatelessWidget {
+  final dynamic response;
+  ResponseCard({Key? key, required this.response}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +26,9 @@ class ClientLogDetailResponse extends StatelessWidget {
                 Text(hms),
                 GestureDetector(
                     onTap: () {
-                      Clipboard.setData(
-                          ClipboardData(text: stringfyResponse(response, hms)));
-                      _showClipboardAlert(context);
+                      Clipboard.setData(ClipboardData(
+                          text: stringfyHttpValue(response, hms)));
+                      showClipboardAlert(context);
                     },
                     child: _buildCopyButton()),
               ],
@@ -53,33 +54,5 @@ class ClientLogDetailResponse extends StatelessWidget {
     return Row(
       children: const [Text('Copy '), Icon(Icons.copy)],
     );
-  }
-
-  void _showClipboardAlert(context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: const Text('Copied to clipboard.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text("Close"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  String stringfyResponse(response, hms) {
-    Object responseObject = {
-      'responseTime': hms,
-      'responseHeader': {response.headers},
-      'responseBody': response.data,
-    };
-    return responseObject.toString();
   }
 }

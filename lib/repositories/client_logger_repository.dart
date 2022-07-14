@@ -1,41 +1,19 @@
 import 'package:dio/dio.dart';
-
-import 'custom_log_interceptor.dart';
+import 'package:flutter_logger/models/http_request_model.dart';
+import 'package:flutter_logger/models/http_model.dart';
+import 'package:flutter_logger/view_models/client_log_view_model.dart';
 
 BaseOptions baseOptions = BaseOptions(
   baseUrl: "https://reqres.in/api",
-  connectTimeout: 3000,
-  receiveTimeout: 3000,
+  connectTimeout: 10000,
+  receiveTimeout: 10000,
   followRedirects: false,
   validateStatus: (status) {
     return status! < 600;
   },
 );
 
-typedef OutputCallback = void Function(ReturnValue value);
-
-class Request {
-  final dynamic requestTime;
-  final String method;
-  final String url;
-  final Map<String, dynamic>? queryParameters;
-  final Map<String, dynamic>? header;
-  final dynamic body;
-
-  Request(this.requestTime, this.method, this.url, this.queryParameters,
-      this.header, this.body);
-}
-
-class ReturnValue {
-  final Request request;
-  final Response response;
-
-  ReturnValue(this.request, this.response);
-}
-
-class ClientLogger {
-  static final Set<OutputCallback> _outputCallbacks = {};
-
+class ClientLoggerRepository {
   void get(
     String url, {
     Map<String, dynamic>? queryParameters,
@@ -141,11 +119,11 @@ class ClientLogger {
         baseOptions.copyWith(queryParameters: queryParameters, method: type);
     final dio = Dio(dioOptions)
       ..interceptors.add(
-        CustomLogInterceptor(),
+        ClientLogInterceptorViewModel(),
       );
     try {
       DateTime requestTime = DateTime.now().toLocal();
-      var request = Request(
+      var request = HttpRequestModel(
           requestTime,
           dio.options.method,
           dio.options.baseUrl + url,
@@ -162,20 +140,14 @@ class ClientLogger {
       );
       DateTime responseTime = DateTime.now().toLocal();
       response.headers['date']?[0] = responseTime.toString();
-      var returnValue = ReturnValue(request, response);
-      for (var callback in _outputCallbacks) {
+      var returnValue = HttpModel(request, response);
+      Set<OutputCallback> outputCallbacks =
+          ClientLogEvent.getOutputCallbacks;
+      for (var callback in outputCallbacks) {
         callback(returnValue);
       }
     } catch (e) {
       print("Exception: $e");
     }
-  }
-
-  static void addOutputListener(OutputCallback callback) {
-    _outputCallbacks.add(callback);
-  }
-
-  static void removeOutputListener(OutputCallback callback) {
-    _outputCallbacks.remove(callback);
   }
 }

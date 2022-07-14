@@ -1,49 +1,21 @@
-// import 'output/log_output.dart';
-// import 'output/custom_log_output.dart';
-import 'printer/log_printer.dart';
-import 'printer/custom_log_printer.dart';
+import 'package:flutter_logger/models/environments_model.dart';
+import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/log_event_model.dart';
+import 'package:flutter_logger/models/output_event_model.dart';
+import 'package:flutter_logger/view_models/app_log_view_model.dart';
+
+import '../models/log_printer_model.dart';
 import 'dart:developer' as developer;
 
-enum Level {
-  info,
-  warning,
-  error,
-  debug,
-  verbose,
-  nothing,
-}
-
-class LogEvent {
-  final Level level;
-  final dynamic message;
-  final dynamic error;
-  final StackTrace? stackTrace;
-
-  LogEvent(this.level, this.message, this.error, this.stackTrace);
-}
-
-class OutputEvent {
-  final Level level;
-  final List<String> lines;
-
-  OutputEvent(this.level, this.lines);
-}
-
-typedef OutputCallback = void Function(OutputEvent event);
-typedef OutputCallbackWithoutPrefix = void Function(OutputEvent event);
-
-class Logger {
+class AppLoggerRepository {
   static Level level = Level.nothing;
-  static final Set<OutputCallback> _outputCallbacks = {};
-  static final Set<OutputCallbackWithoutPrefix> _outputCallbacksWithoutPrefix =
-      {};
-  final LogPrinter _printer;
+  final LogPrinterModel _printer;
   bool _active = true;
 
-  Logger({
-    LogPrinter? printer,
+  AppLoggerRepository({
+    LogPrinterModel? printer,
     Level? level,
-  }) : _printer = printer ?? CustomLogPrinter();
+  }) : _printer = printer ?? LogPrinter();
 
   /// Log a message at level [Level.verbose].
   void v(dynamic message, [dynamic error, StackTrace? stackTrace]) {
@@ -80,17 +52,22 @@ class Logger {
     } else if (level == Level.nothing) {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
-    var logEvent = LogEvent(level, message, error, stackTrace);
+    if (level.index > EnvironmentsModel.getMaxDisplayLevel.index) return;
+    var logEvent = LogEventModel(level, message, error, stackTrace);
     List<String> output = _printer.log(logEvent, false);
     List<String> outputWithoutPrefix = _printer.log(logEvent, true);
+    Set<OutputCallback> outputCallbacks = AppLogEvent.getOutputCallbacks;
+    Set<OutputCallbackWithoutPrefix> outputCallbackWithoutPrefix =
+        AppLogEvent.getOutputCallbacksWithoutPrefix;
 
     if (output.isNotEmpty) {
-      var outputEvent = OutputEvent(level, output);
-      var outputEventWithoutPrefix = OutputEvent(level, outputWithoutPrefix);
-      for (var callback in _outputCallbacks) {
+      var outputEvent = OutputEventModel(level, output);
+      var outputEventWithoutPrefix =
+          OutputEventModel(level, outputWithoutPrefix);
+      for (var callback in outputCallbacks) {
         callback(outputEvent);
       }
-      for (var callback in _outputCallbacksWithoutPrefix) {
+      for (var callback in outputCallbackWithoutPrefix) {
         callback(outputEventWithoutPrefix);
       }
       try {
@@ -107,23 +84,5 @@ class Logger {
   void close() {
     _active = false;
     _printer.destroy();
-  }
-
-  static void addOutputListener(OutputCallback callback) {
-    _outputCallbacks.add(callback);
-  }
-
-  static void removeOutputListener(OutputCallback callback) {
-    _outputCallbacks.remove(callback);
-  }
-
-  static void addOutputListenerWithoutPrefix(
-      OutputCallbackWithoutPrefix callback) {
-    _outputCallbacksWithoutPrefix.add(callback);
-  }
-
-  static void removeOutputListenerWithoutPrefix(
-      OutputCallbackWithoutPrefix callback) {
-    _outputCallbacksWithoutPrefix.remove(callback);
   }
 }
