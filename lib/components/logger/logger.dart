@@ -1,5 +1,7 @@
 // import 'output/log_output.dart';
 // import 'output/custom_log_output.dart';
+import 'package:flutter_logger/environments.dart';
+
 import 'printer/log_printer.dart';
 import 'printer/custom_log_printer.dart';
 import 'dart:developer' as developer;
@@ -80,6 +82,8 @@ class Logger {
     } else if (level == Level.nothing) {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
+    if (level.index > Environments.getMaxDisplayLevel.index) return;
+
     var logEvent = LogEvent(level, message, error, stackTrace);
     List<String> output = _printer.log(logEvent, false);
     List<String> outputWithoutPrefix = _printer.log(logEvent, true);
