@@ -168,6 +168,7 @@ class _LogConsoleState extends State<LogConsole> {
               accentColor: Colors.black,
             ),
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

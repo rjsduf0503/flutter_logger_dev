@@ -6,6 +6,10 @@ BaseOptions baseOptions = BaseOptions(
   baseUrl: "https://reqres.in/api",
   connectTimeout: 3000,
   receiveTimeout: 3000,
+  followRedirects: false,
+  validateStatus: (status) {
+    return status! < 600;
+  },
 );
 
 typedef OutputCallback = void Function(ReturnValue value);
