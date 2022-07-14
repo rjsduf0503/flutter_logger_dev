@@ -43,7 +43,7 @@ class AppLogContents extends StatelessWidget {
                 ],
               );
             },
-            itemCount: provider.filteredBuffer.length,
+            itemCount: provider.filteredBufferWithoutPrefix.length,
           ),
         ),
       ),
