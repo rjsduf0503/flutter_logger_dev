@@ -5,6 +5,7 @@ import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 
 import '../models/log_printer_model.dart';
+
 import 'dart:developer' as developer;
 
 class AppLoggerRepository {

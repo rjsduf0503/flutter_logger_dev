@@ -27,7 +27,7 @@ void handleRouting(context, item, {logEntry}) {
 
 class Routing extends StatelessWidget {
   final String item;
-  var logEntry;
+  final dynamic logEntry;
 
   Routing(this.item, this.logEntry, {Key? key}) : super(key: key);
 

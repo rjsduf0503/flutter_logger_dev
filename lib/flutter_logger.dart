@@ -40,7 +40,7 @@ class FlutterLogger extends StatelessWidget {
             secondary: Colors.black,
           ),
         ),
-        home: const HomeScreen(),
+        home: HomeScreen(),
       ),
     );
   }

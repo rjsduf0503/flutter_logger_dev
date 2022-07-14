@@ -6,15 +6,10 @@ import 'package:flutter_logger/repositories/app_logger_repository.dart';
 AppLoggerRepository appLogger = AppLoggerRepository();
 ClientLoggerRepository clientLogger = ClientLoggerRepository();
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
   ValueNotifier<bool> isDialOpen = ValueNotifier(false);
+
+  HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
