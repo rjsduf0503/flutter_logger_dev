@@ -19,8 +19,7 @@ class AppLogViewModel with ChangeNotifier {
   factory AppLogViewModel() => _appLogConsoleViewModel;
 
   AppLogViewModel._internal()
-      : assert(
-            _initialized, "Please call AppLogViewModel.init() first.") {
+      : assert(_initialized, "Please call AppLogViewModel.init() first.") {
     initState();
     didChangeDependencies();
   }
@@ -90,8 +89,8 @@ class AppLogViewModel with ChangeNotifier {
           scrollController.offset >= scrollController.position.maxScrollExtent;
 
       followBottom = scrolledToBottom;
+      notifyListeners();
     });
-    notifyListeners();
   }
 
   void didChangeDependencies() {
