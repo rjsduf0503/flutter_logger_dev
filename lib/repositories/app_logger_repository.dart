@@ -57,27 +57,24 @@ class AppLoggerRepository {
     var logEvent = LogEventModel(level, message, error, stackTrace);
     List<String> output = _printer.log(logEvent, false);
     List<String> outputWithoutPrefix = _printer.log(logEvent, true);
-    Set<OutputCallback> outputCallbacks = AppLogEvent.getOutputCallbacks;
     Set<OutputCallbackWithoutPrefix> outputCallbackWithoutPrefix =
         AppLogEvent.getOutputCallbacksWithoutPrefix;
 
-    if (output.isNotEmpty) {
-      var outputEvent = OutputEventModel(level, output);
+    if (outputWithoutPrefix.isNotEmpty) {
       var outputEventWithoutPrefix =
           OutputEventModel(level, outputWithoutPrefix);
-      for (var callback in outputCallbacks) {
-        callback(outputEvent);
-      }
       for (var callback in outputCallbackWithoutPrefix) {
         callback(outputEventWithoutPrefix);
       }
-      try {
-        for (var item in output) {
-          developer.log(item);
+      if (output.isNotEmpty) {
+        try {
+          for (var item in output) {
+            developer.log(item);
+          }
+        } catch (e, s) {
+          print(e);
+          print(s);
         }
-      } catch (e, s) {
-        print(e);
-        print(s);
       }
     }
   }

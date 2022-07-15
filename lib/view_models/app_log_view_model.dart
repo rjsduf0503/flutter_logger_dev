@@ -19,10 +19,7 @@ class AppLogViewModel with ChangeNotifier {
   factory AppLogViewModel() => _appLogConsoleViewModel;
 
   AppLogViewModel._internal()
-      : assert(_initialized, "Please call AppLogViewModel.init() first.") {
-    initState();
-    didChangeDependencies();
-  }
+      : assert(_initialized, "Please call AppLogViewModel.init() first.");
 
   static void init({int bufferSize = 100}) {
     if (_initialized) return;
@@ -55,11 +52,25 @@ class AppLogViewModel with ChangeNotifier {
   final scrollController = ScrollController();
   final filterController = TextEditingController();
 
+  late List<bool> extended = [];
+
   Level filterLevel = Level.nothing;
 
   var _currentId = 0;
   bool _scrollListenerEnabled = true;
   bool followBottom = true;
+
+  static final bool dark =
+      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
+
+  final levelColorsInApp = {
+    Level.info: dark ? Colors.lightBlue[300] : Colors.indigo[700],
+    Level.warning: dark ? Colors.orange[300] : Colors.orange[700],
+    Level.error: dark ? Colors.red[300] : Colors.red[700],
+    Level.debug: dark ? Colors.lightGreen[300] : Colors.lightGreen[700],
+    Level.verbose: dark ? Colors.grey[600] : Colors.grey[700],
+    Level.nothing: dark ? Colors.white : Colors.black,
+  };
 
   void initState() {
     _callback = (e) {
@@ -91,6 +102,7 @@ class AppLogViewModel with ChangeNotifier {
       followBottom = scrolledToBottom;
       notifyListeners();
     });
+    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
   }
 
   void didChangeDependencies() {
@@ -102,8 +114,8 @@ class AppLogViewModel with ChangeNotifier {
     for (var event in _outputEventBufferWithoutPrefix) {
       _renderedBufferWithoutPrefix.add(_renderEvent(event));
     }
+    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
     refreshFilter();
-    notifyListeners();
   }
 
   List<RenderedAppLogEventModel> getFilteredBuffer(
@@ -134,6 +146,12 @@ class AppLogViewModel with ChangeNotifier {
     if (followBottom) {
       Future.delayed(Duration.zero, scrollToBottom);
     }
+    // notifyListeners();
+  }
+
+  void handleExtendLogIcon(int index) {
+    print(11);
+    extended[index] = !extended[index];
     notifyListeners();
   }
 
@@ -154,15 +172,12 @@ class AppLogViewModel with ChangeNotifier {
   }
 
   RenderedAppLogEventModel _renderEvent(OutputEventModel event) {
-    var parser = AnsiParser(
-        dark: WidgetsBinding.instance.window.platformBrightness ==
-            Brightness.dark);
+    Color? color = levelColorsInApp[event.level];
     var text = event.lines.join('\n');
-    parser.parse(text);
     return RenderedAppLogEventModel(
       _currentId++,
       event.level,
-      TextSpan(children: parser.spans),
+      color!,
       text.toLowerCase(),
     );
   }
@@ -204,134 +219,6 @@ class AppLogEvent {
   static Set<OutputCallback> get getOutputCallbacks => _outputCallbacks;
   static Set<OutputCallbackWithoutPrefix> get getOutputCallbacksWithoutPrefix =>
       _outputCallbacksWithoutPrefix;
-}
-
-class AnsiParser {
-  static const TEXT = 0, BRACKET = 1, CODE = 2;
-
-  final bool dark;
-
-  AnsiParser({required this.dark});
-
-  Color? foreground;
-  Color? background;
-  List<TextSpan>? spans;
-
-  void parse(String s) {
-    spans = [];
-    var state = TEXT;
-    late StringBuffer buffer;
-    var text = StringBuffer();
-    var code = 0;
-    List<int> codes = [];
-
-    for (var i = 0, n = s.length; i < n; i++) {
-      var c = s[i];
-
-      switch (state) {
-        case TEXT:
-          if (c == '\u001b') {
-            state = BRACKET;
-            buffer = StringBuffer(c);
-            code = 0;
-            codes = [];
-          } else {
-            text.write(c);
-          }
-          break;
-
-        case BRACKET:
-          buffer.write(c);
-          if (c == '[') {
-            state = CODE;
-          } else {
-            state = TEXT;
-            text.write(buffer);
-          }
-          break;
-
-        case CODE:
-          buffer.write(c);
-          var codeUnit = c.codeUnitAt(0);
-          if (codeUnit >= 48 && codeUnit <= 57) {
-            code = code * 10 + codeUnit - 48;
-            continue;
-          } else if (c == ';') {
-            codes.add(code);
-            code = 0;
-            continue;
-          } else {
-            if (text.isNotEmpty) {
-              spans?.add(createSpan(text.toString()));
-              text.clear();
-            }
-            state = TEXT;
-            if (c == 'm') {
-              codes.add(code);
-              handleCodes(codes);
-            } else {
-              text.write(buffer);
-            }
-          }
-
-          break;
-      }
-    }
-
-    spans?.add(createSpan(text.toString()));
-  }
-
-  void handleCodes(List<int> codes) {
-    if (codes.isEmpty) {
-      codes.add(0);
-    }
-
-    switch (codes[0]) {
-      case 0:
-        foreground = getColor(0, true);
-        background = getColor(0, false);
-        break;
-      case 38:
-        foreground = getColor(codes[2], true);
-        break;
-      case 39:
-        foreground = getColor(0, true);
-        break;
-      case 48:
-        background = getColor(codes[2], false);
-        break;
-      case 49:
-        background = getColor(0, false);
-    }
-  }
-
-  Color? getColor(int colorCode, bool foreground) {
-    switch (colorCode) {
-      case 0:
-        return foreground ? Colors.black : Colors.transparent;
-      case 12: //info
-        return dark ? Colors.lightBlue[300] : Colors.indigo[700];
-      case 208: //warning
-        return dark ? Colors.orange[300] : Colors.orange[700];
-      case 196: //error
-        return dark ? Colors.red[300] : Colors.red[700];
-      case 190: //debug
-        return dark ? Colors.lightGreen[300] : Colors.lightGreen[700];
-      case 244: //verbose
-        return dark ? Colors.grey[600] : Colors.grey[700];
-    }
-    return foreground ? Colors.black : Colors.transparent;
-  }
-
-  TextSpan createSpan(String text) {
-    return TextSpan(
-      text: text,
-      style: TextStyle(
-        color: foreground,
-        backgroundColor: background,
-      ),
-    );
-  }
 }
 
 class LogPrinter extends LogPrinterModel {
@@ -541,26 +428,19 @@ class LogPrinter extends LogPrinterModel {
   }
 
   Colorizing _getLevelColor(Level level, bool isWithoutPrefix) {
-    if (isWithoutPrefix) {
-      return Colorizing.none();
+    if (isWithoutPrefix) return Colorizing.none();
+    if (colors) {
+      return levelColors[level]!;
     } else {
-      if (colors) {
-        return levelColors[level]!;
-      } else {
-        return Colorizing.none();
-      }
+      return Colorizing.none();
     }
   }
 
-  Colorizing _getErrorColor(Level level, bool isWithoutPrefix) {
-    if (isWithoutPrefix) {
-      return Colorizing.none();
+  Colorizing _getErrorColor(Level level) {
+    if (colors) {
+      return levelColors[Level.error]!.toBg();
     } else {
-      if (colors) {
-        return levelColors[Level.error]!.toBg();
-      } else {
-        return Colorizing.none();
-      }
+      return Colorizing.none();
     }
   }
 
@@ -581,45 +461,48 @@ class LogPrinter extends LogPrinterModel {
     String? stacktrace,
   ) {
     List<String> buffer = [];
-    var verticalLineAtLevel = (includeBox[level]!) ? ('$verticalLine ') : '';
     var color = _getLevelColor(level, isWithoutPrefix);
-    if (includeBox[level]!) buffer.add(color(_topBorder));
+    bool withoutPrefix = (includeBox[level]!) && isWithoutPrefix;
+    var verticalLineAtLevel = !withoutPrefix ? ('$verticalLine ') : '';
+
+    if (!withoutPrefix) buffer.add(color(_topBorder));
 
     if (error != null) {
-      var errorColor = _getErrorColor(level, isWithoutPrefix);
+      var errorColor = _getErrorColor(level);
       for (var line in error.split('\n')) {
         buffer.add(
-          color(verticalLineAtLevel) +
+          verticalLineAtLevel +
               errorColor.resetForeground +
               errorColor(line) +
               errorColor.resetBackground,
         );
       }
-      if (includeBox[level]!) buffer.add(color(_middleBorder));
+      if (!withoutPrefix) buffer.add(color(_middleBorder));
     }
 
     if (stacktrace != null) {
       for (var line in stacktrace.split('\n')) {
         buffer.add(color('$verticalLineAtLevel$line'));
       }
-      if (includeBox[level]!) buffer.add(color(_middleBorder));
+      if (!withoutPrefix) buffer.add(color(_middleBorder));
     }
 
     if (time != null) {
       buffer.add(color('$verticalLineAtLevel$time'));
-      if (includeBox[level]!) buffer.add(color(_middleBorder));
+      if (!withoutPrefix) buffer.add(color(_middleBorder));
     }
 
     var emoji = _getEmoji(level);
     for (var line in message.split('\n')) {
       buffer.add(color('$verticalLineAtLevel$emoji$line'));
     }
-    if (includeBox[level]!) buffer.add(color(_bottomBorder));
+    if (!withoutPrefix) buffer.add(color(_bottomBorder));
 
     return buffer;
   }
 }
 
+// For Debug Console
 class Colorizing {
   static const ansiEsc = '\x1B[';
 

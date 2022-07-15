@@ -14,9 +14,8 @@ class RenderedClientLogEventModel {
 class RenderedAppLogEventModel {
   final int id;
   final Level level;
-  final TextSpan span;
+  final Color color;
   final String lowerCaseText;
 
-  RenderedAppLogEventModel(this.id, this.level, this.span, this.lowerCaseText);
+  RenderedAppLogEventModel(this.id, this.level, this.color, this.lowerCaseText);
 }
-
