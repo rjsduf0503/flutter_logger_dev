@@ -6,8 +6,33 @@ import 'package:flutter_logger/components/log_header.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:provider/provider.dart';
 
-class AppLogScreen extends StatelessWidget {
+class AppLogScreen extends StatefulWidget {
   const AppLogScreen({Key? key}) : super(key: key);
+
+  AppLogScreenState createState() => AppLogScreenState();
+}
+
+class AppLogScreenState extends State<AppLogScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    AppLogViewModel().initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    AppLogViewModel().didChangeDependencies();
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
   @override
   Widget build(BuildContext context) {
     var brightness = MediaQuery.of(context).platformBrightness;
@@ -34,7 +59,6 @@ class AppLogScreen extends StatelessWidget {
             ),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               LogHeader(
                 parentContext: context,

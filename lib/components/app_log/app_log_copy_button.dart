@@ -17,8 +17,8 @@ class AppLogCopyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: 10,
-      top: 10,
+      left: 0,
+      top: 0,
       child: Container(
         decoration: BoxDecoration(color: dark ? Colors.black : Colors.white),
         child: InkWell(
@@ -27,7 +27,7 @@ class AppLogCopyButton extends StatelessWidget {
             showClipboardAlert(context);
           }),
           child: Icon(Icons.copy,
-              color: dark ? Colors.white : Colors.black, size: size * 2),
+              color: dark ? Colors.white : Colors.black, size: size * 1.5),
         ),
       ),
     );
