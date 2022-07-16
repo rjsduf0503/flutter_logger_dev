@@ -17,19 +17,7 @@ class RequestCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildCardHeader(),
-                GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(
-                          ClipboardData(text: stringfyHttpValue(request)));
-                      showClipboardAlert(context);
-                    },
-                    child: _buildCopyButton()),
-              ],
-            ),
+            _buildCardHeader(),
             _buildCardContent(),
           ],
         ),
@@ -57,12 +45,6 @@ class RequestCard extends StatelessWidget {
         Text('요청 헤더: ${request.header}'),
         Text('요청 본문: ${request.body}'),
       ],
-    );
-  }
-
-  Widget _buildCopyButton() {
-    return Row(
-      children: const [Text('Copy '), Icon(Icons.copy)],
     );
   }
 }

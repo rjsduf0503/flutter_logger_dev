@@ -64,6 +64,7 @@ class AppLogScreenState extends State<AppLogScreen>
                 parentContext: context,
                 dark: dark,
                 consoleType: 'App Log',
+                provider: provider,
               ),
               Expanded(
                 child: AppLogContents(dark: dark, provider: provider),

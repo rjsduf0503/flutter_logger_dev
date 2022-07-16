@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_logger/components/log_bar.dart';
+import 'package:flutter_logger/global_functions.dart';
 
 class LogHeader extends StatelessWidget {
   final bool dark;
   final dynamic parentContext;
   final String consoleType;
+  final dynamic provider;
+  final dynamic stringHttp;
 
-  const LogHeader(
-      {Key? key,
-      this.dark = false,
-      required this.parentContext,
-      required this.consoleType})
-      : super(key: key);
+  const LogHeader({
+    Key? key,
+    this.dark = false,
+    required this.parentContext,
+    required this.consoleType,
+    this.provider,
+    this.stringHttp,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +34,26 @@ class LogHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // todo: 복사 버튼
+          consoleType == 'Client Log Detail'
+              ? const SizedBox.shrink()
+              : Checkbox(
+                  value: !provider.checked.contains(false),
+                  onChanged: (value) {
+                    provider.handleAllCheckboxClick();
+                  },
+                ),
+          IconButton(
+            icon: const Icon(Icons.copy, size: 22),
+            onPressed: () {
+              if (consoleType == 'Client Log Detail') {
+                Clipboard.setData(ClipboardData(text: stringHttp));
+                showClipboardAlert(context);
+              } else if (provider.copyText != '') {
+                Clipboard.setData(ClipboardData(text: provider.copyText));
+                showClipboardAlert(context);
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {

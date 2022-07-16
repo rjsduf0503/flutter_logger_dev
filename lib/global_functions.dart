@@ -31,23 +31,24 @@ void showClipboardAlert(context) {
   );
 }
 
-String stringfyHttpValue(value, [hms]) {
-  if (hms != null) {
-    Object responseObject = {
-      'responseTime': hms,
-      'responseHeader': {value.headers},
-      'responseBody': value.data,
-    };
-    return responseObject.toString();
-  } else {
-    Object requestObject = {
-      'requestTime': DateFormat.Hms().format(value.requestTime),
-      'reuqestMethod': value.method,
-      'requestUri': value.url,
-      'queryParameters': value.queryParameters,
-      'requestHeader': value.header,
-      'requestBody': value.body,
-    };
-    return requestObject.toString();
-  }
+String stringfyHttp(value) {
+  var stringResponseTime = value.response.headers['date']?.first;
+  DateTime responseTime = DateTime.parse(stringResponseTime);
+  var hms = DateFormat.Hms().format(responseTime);
+
+  Object requestObject = {
+    'requestTime': DateFormat.Hms().format(value.request.requestTime),
+    'reuqestMethod': value.request.method,
+    'requestUri': value.request.url,
+    'queryParameters': value.request.queryParameters,
+    'requestHeader': value.request.header,
+    'requestBody': value.request.body,
+  };
+  Object responseObject = {
+    'responseTime': hms,
+    'responseHeader': {value.response.headers},
+    'responseBody': value.response.data,
+  };
+
+  return '${requestObject.toString()} \n ${responseObject.toString()}';
 }

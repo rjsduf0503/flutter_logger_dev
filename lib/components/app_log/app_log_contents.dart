@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/components/app_log/app_log_copy_button.dart';
+import 'package:flutter_logger/components/log_checkbox.dart';
 import 'package:flutter_logger/components/app_log/app_log_extend_button.dart';
 
 class AppLogContents extends StatelessWidget {
@@ -72,10 +72,10 @@ class AppLogContents extends StatelessWidget {
                               : const SizedBox.shrink(),
                         ],
                       ),
-                      AppLogCopyButton(
-                        logEntry: logEntryWithoutPrefix,
-                        dark: dark,
-                        size: 14,
+                      LogCheckbox(
+                        provider: provider,
+                        index: index,
+                        position: const [-8, -15],
                       ),
                       AppLogExtendButton(provider: provider, index: index),
                     ],
