@@ -4,7 +4,8 @@ class AppLogExtendButton extends StatelessWidget {
   final dynamic provider;
   final int index;
 
-  const AppLogExtendButton({Key? key, this.provider, required this.index})
+  const AppLogExtendButton(
+      {Key? key, required this.provider, required this.index})
       : super(key: key);
 
   @override
@@ -14,8 +15,7 @@ class AppLogExtendButton extends StatelessWidget {
       top: -3,
       child: InkWell(
         onTap: (() {
-          provider.handleExtendLogIcon(index);
-          // });
+          provider.handleExtendLogIconClick(index);
         }),
         child: provider.extended[index]
             ? Icon(Icons.remove,

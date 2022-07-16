@@ -20,19 +20,7 @@ class ResponseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(hms),
-                GestureDetector(
-                    onTap: () {
-                      Clipboard.setData(ClipboardData(
-                          text: stringfyHttpValue(response, hms)));
-                      showClipboardAlert(context);
-                    },
-                    child: _buildCopyButton()),
-              ],
-            ),
+            Text(hms),
             _buildCardContent(),
           ],
         ),
@@ -47,12 +35,6 @@ class ResponseCard extends StatelessWidget {
         Text('응답 헤더: ${{response.headers}}'),
         Text('응답 본문: ${response.data}'),
       ],
-    );
-  }
-
-  Widget _buildCopyButton() {
-    return Row(
-      children: const [Text('Copy '), Icon(Icons.copy)],
     );
   }
 }

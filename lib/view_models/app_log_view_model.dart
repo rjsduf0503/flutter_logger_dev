@@ -48,11 +48,14 @@ class AppLogViewModel with ChangeNotifier {
       ListQueue();
   List<RenderedAppLogEventModel> filteredBuffer = [];
   List<RenderedAppLogEventModel> filteredBufferWithoutPrefix = [];
+  List<RenderedAppLogEventModel> checkedBuffer = [];
+  String copyText = '';
 
   final scrollController = ScrollController();
   final filterController = TextEditingController();
 
   late List<bool> extended = [];
+  late List<bool> checked = [];
 
   Level filterLevel = Level.nothing;
 
@@ -103,6 +106,7 @@ class AppLogViewModel with ChangeNotifier {
       notifyListeners();
     });
     extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+    checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
   }
 
   void didChangeDependencies() {
@@ -115,6 +119,7 @@ class AppLogViewModel with ChangeNotifier {
       _renderedBufferWithoutPrefix.add(_renderEvent(event));
     }
     extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+    checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
     refreshFilter();
   }
 
@@ -146,12 +151,52 @@ class AppLogViewModel with ChangeNotifier {
     if (followBottom) {
       Future.delayed(Duration.zero, scrollToBottom);
     }
-    // notifyListeners();
   }
 
-  void handleExtendLogIcon(int index) {
-    print(11);
+  void handleExtendLogIconClick(int index) {
     extended[index] = !extended[index];
+    notifyListeners();
+  }
+
+  void handleCheckboxClick(int index) {
+    checked[index] = !checked[index];
+    if (checked[index]) {
+      checkedBuffer.add(filteredBufferWithoutPrefix[index]);
+    } else {
+      checkedBuffer.removeWhere(
+          (element) => element == filteredBufferWithoutPrefix[index]);
+    }
+    checkedBuffer.sort((a, b) => a.id.compareTo(b.id));
+
+    copyText = '';
+    if (checkedBuffer.isNotEmpty) {
+      for (var element in checkedBuffer) {
+        copyText += checkedBuffer.last == element
+            ? element.lowerCaseText
+            : '${element.lowerCaseText}\n\n';
+      }
+    }
+
+    notifyListeners();
+  }
+
+  void handleAllCheckboxClick() {
+    bool allChecked = !checked.contains(false);
+    checked.fillRange(0, checked.length, !allChecked);
+
+    checkedBuffer = [];
+    copyText = '';
+    if (!allChecked) {
+      checkedBuffer.addAll(filteredBufferWithoutPrefix);
+      if (checkedBuffer.isNotEmpty) {
+        for (var element in checkedBuffer) {
+          copyText += checkedBuffer.last == element
+              ? element.lowerCaseText
+              : '${element.lowerCaseText}\n\n';
+        }
+      }
+    }
+
     notifyListeners();
   }
 

@@ -6,8 +6,35 @@ import 'package:flutter_logger/components/log_header.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';
 import 'package:provider/provider.dart';
 
-class ClientLogScreen extends StatelessWidget {
+class ClientLogScreen extends StatefulWidget {
   const ClientLogScreen({Key? key}) : super(key: key);
+
+  @override
+  _ClientLogScreenState createState() => _ClientLogScreenState();
+}
+
+class _ClientLogScreenState extends State<ClientLogScreen>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    ClientLogViewModel().initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ClientLogViewModel().didChangeDependencies();
+    });
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +51,7 @@ class ClientLogScreen extends StatelessWidget {
                 parentContext: context,
                 dark: dark,
                 consoleType: 'Client Log',
+                provider: provider,
               ),
               Expanded(
                 child: ClientLogContents(provider: provider),
