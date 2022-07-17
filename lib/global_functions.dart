@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -52,3 +53,9 @@ String stringfyHttp(value) {
 
   return '${requestObject.toString()} \n ${responseObject.toString()}';
 }
+
+void debugPrintSynchronouslyWithText(String message, {int? wrapWidth}) {
+  message = "[${DateTime.now()}]: $message";
+  debugPrintSynchronously(message, wrapWidth: wrapWidth);
+}
+

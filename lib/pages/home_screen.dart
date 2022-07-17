@@ -3,7 +3,6 @@ import 'package:flutter_logger/components/fab.dart';
 import 'package:flutter_logger/repositories/client_logger_repository.dart';
 import 'package:flutter_logger/repositories/app_logger_repository.dart';
 
-AppLoggerRepository appLogger = AppLoggerRepository();
 ClientLoggerRepository clientLogger = ClientLoggerRepository();
 
 class HomeScreen extends StatelessWidget {
@@ -29,16 +28,6 @@ class HomeScreen extends StatelessWidget {
             children: <Widget>[
               const Text(
                 'Flutter Logger Home',
-              ),
-              TextButton(
-                onPressed: () {
-                  appLogger.e('error test');
-                  appLogger.v('verbose test');
-                  appLogger.d('debug test');
-                  appLogger.i('info test');
-                  appLogger.w('warning test');
-                },
-                child: Text('App test add'),
               ),
               TextButton(
                 onPressed: () {
