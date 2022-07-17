@@ -34,26 +34,30 @@ class LogHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          consoleType == 'Client Log Detail'
-              ? const SizedBox.shrink()
-              : Checkbox(
-                  value: !provider.checked.contains(false),
+          identical(consoleType, 'Client Log') ||
+                  identical(consoleType, 'App Log')
+              ? Checkbox(
+                  value: !provider.checked.contains(false) &&
+                      provider.checked.isNotEmpty,
                   onChanged: (value) {
                     provider.handleAllCheckboxClick();
                   },
-                ),
-          IconButton(
-            icon: const Icon(Icons.copy, size: 22),
-            onPressed: () {
-              if (consoleType == 'Client Log Detail') {
-                Clipboard.setData(ClipboardData(text: stringHttp));
-                showClipboardAlert(context);
-              } else if (provider.copyText != '') {
-                Clipboard.setData(ClipboardData(text: provider.copyText));
-                showClipboardAlert(context);
-              }
-            },
-          ),
+                )
+              : const SizedBox.shrink(),
+          !consoleType.contains('Test')
+              ? IconButton(
+                  icon: const Icon(Icons.copy, size: 22),
+                  onPressed: () {
+                    if (consoleType == 'Client Log Detail') {
+                      Clipboard.setData(ClipboardData(text: stringHttp));
+                      showClipboardAlert(context);
+                    } else if (provider.copyText != '') {
+                      Clipboard.setData(ClipboardData(text: provider.copyText));
+                      showClipboardAlert(context);
+                    }
+                  },
+                )
+              : const SizedBox.shrink(),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
