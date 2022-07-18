@@ -3,9 +3,8 @@ import 'package:flutter_logger/app_log_error_functions.dart';
 import 'package:flutter_logger/components/custom_material_app.dart';
 import 'package:flutter_logger/components/log_header.dart';
 import 'package:flutter_logger/flutter_logger.dart';
-import 'package:flutter_logger/view_models/app_log_test_view_model.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_logger/components/elevated_grey_button.dart';
+import 'package:flutter_logger/components/elevated_color_button.dart';
 
 class AppLogTestScreen extends StatelessWidget {
   const AppLogTestScreen({Key? key}) : super(key: key);
@@ -14,21 +13,28 @@ class AppLogTestScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var brightness = MediaQuery.of(context).platformBrightness;
     bool dark = brightness == Brightness.dark;
-    return Consumer<AppLogTestViewModel>(
-      builder: (context, provider, child) {
-        return CustomMaterialApp(
-          dark: dark,
-          child: Column(
-            children: <Widget>[
-              LogHeader(
-                dark: dark,
-                parentContext: context,
-                consoleType: 'App Log Test',
-              ),
-              Column(
+    return CustomMaterialApp(
+      dark: dark,
+      child: Column(
+        children: <Widget>[
+          LogHeader(
+            dark: dark,
+            parentContext: context,
+            consoleType: 'App Log Test',
+          ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: GridView.count(
+                childAspectRatio: 3,
+                shrinkWrap: true,
+                primary: false,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                crossAxisCount: 2,
                 children: [
-                  ElevatedGreyButton(
-                    text: 'App test add',
+                  ElevatedColorButton(
+                    text: 'App Error Test',
                     pressEvent: () {
                       appLogger.e('error test');
                       appLogger.v('verbose test');
@@ -37,43 +43,43 @@ class AppLogTestScreen extends StatelessWidget {
                       appLogger.w('warning test');
                     },
                   ),
-                  ElevatedGreyButton(
-                    text: 'Overflow test',
+                  ElevatedColorButton(
+                    text: 'Overflow Error Test',
                     pressEvent: () {
                       overflowError(context);
                     },
                   ),
-                  ElevatedGreyButton(
-                    text: 'IntegerDivisionByZeroException test',
+                  ElevatedColorButton(
+                    text: 'IntegerDivisionByZeroException Error Test',
                     pressEvent: () {
                       divideError();
                     },
                   ),
-                  ElevatedGreyButton(
-                    text: 'RangeError test',
+                  ElevatedColorButton(
+                    text: 'Range Error Test',
                     pressEvent: () {
                       rangeError();
                     },
                   ),
-                  ElevatedGreyButton(
-                    text: 'TypeError test',
+                  ElevatedColorButton(
+                    text: 'Type Error Test',
                     pressEvent: () {
                       typeError();
                     },
                   ),
-                  ElevatedGreyButton(
-                    text: 'AssertError test',
+                  ElevatedColorButton(
+                    text: 'Assert Error Test',
                     pressEvent: () {
                       assertError();
                     },
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
-            ],
+            ),
           ),
-        );
-      },
+          const SizedBox(height: 20),
+        ],
+      ),
     );
   }
 }

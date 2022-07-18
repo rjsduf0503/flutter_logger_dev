@@ -1,16 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-int getTimeDifference(time) {
+String getTimeDifference(time) {
+  if (time == '') return time;
   List timeList = time.toString().split('.');
   List hms = timeList[0].split(':');
   String ms = timeList[1];
 
-  return int.parse(hms[0]) * 3600000 +
-      int.parse(hms[1]) * 60000 +
-      int.parse(hms[2]) * 1000 +
-      int.parse(ms.substring(0, 3));
+  return '${int.parse(hms[0]) * 3600000 + int.parse(hms[1]) * 60000 + int.parse(hms[2]) * 1000 + int.parse(ms.substring(0, 3))} ms';
 }
 
 void showClipboardAlert(context) {
@@ -32,30 +29,47 @@ void showClipboardAlert(context) {
   );
 }
 
-String stringfyHttp(value) {
-  var stringResponseTime = value.response.headers['date']?.first;
-  DateTime responseTime = DateTime.parse(stringResponseTime);
-  var hms = DateFormat.Hms().format(responseTime);
+String stringfyHttp(value, {errorType}) {
+  List<String> str = [];
+  var requestTime = value.request.requestTime.toString().split('.')[0];
+  var statusMessage =
+      value.response != null ? value.response.statusMessage : errorType;
+  var requestPrefix = '[$statusMessage] - [$requestTime]:     ';
 
-  Object requestObject = {
-    'requestTime': DateFormat.Hms().format(value.request.requestTime),
-    'reuqestMethod': value.request.method,
-    'requestUri': value.request.url,
-    'queryParameters': value.request.queryParameters,
-    'requestHeader': value.request.header,
-    'requestBody': value.request.body,
-  };
-  Object responseObject = {
-    'responseTime': hms,
-    'responseHeader': {value.response.headers},
-    'responseBody': value.response.data,
-  };
+  str.add('$requestPrefix ===== Dio $statusMessage [Start] =====');
+  str.add('$requestPrefix method => ${value.request.method}');
+  str.add('$requestPrefix uri => ${value.request.url}');
+  str.add('$requestPrefix requestHeader => ${value.request.header}');
+  str.add('$requestPrefix requestBody => ${value.request.body}');
 
-  return '${requestObject.toString()} \n ${responseObject.toString()}';
+  if (value.response != null) {
+    var stringResponseTime = value.response.headers['date']?.first;
+    DateTime respTime = DateTime.parse(stringResponseTime);
+    var responseTime = respTime.toString().split('.')[0];
+    var responsePrefix = '[$statusMessage] - [$responseTime]:     ';
+    str.add(
+        '$responsePrefix responseStatus => ${value.response.statusCode.toString()}');
+    str.add(
+        '$responsePrefix responseCorrelationId => a7aa5198-8bb3-40f3-aa30-0c0889a02222');
+    str.add('$responsePrefix responseBody => ${value.response.data}');
+    str.add('$responsePrefix ===== Dio $statusMessage [End] =====');
+  } else {
+    str.add('$requestPrefix ===== Dio $statusMessage [End] =====');
+  }
+
+  return str.join('\n');
 }
 
-void debugPrintSynchronouslyWithText(String message, {int? wrapWidth}) {
-  message = "[${DateTime.now()}]: $message";
+void debugPrintSynchronouslyWithText(String message,
+    {int? wrapWidth, String? currentState, dynamic time}) {
+  time = time.toString().split('.')[0];
+  message = "[$currentState] - [$time]: $message";
   debugPrintSynchronously(message, wrapWidth: wrapWidth);
 }
 
+bool isInt(String str) {
+  if (str == null) {
+    return false;
+  }
+  return int.tryParse(str) != null;
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/global_functions.dart';
 
 List<Color> _statusCodeColor = [
   Colors.white,
@@ -16,9 +17,14 @@ class ResponseType extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int responseTypeColorIndex =
-        int.parse(responseType.toString().substring(0, 1));
-    Color responseTypeColor = _statusCodeColor[responseTypeColorIndex];
+    Color responseTypeColor;
+    if (!isInt(responseType.toString())) {
+      responseTypeColor = Colors.black;
+    } else {
+      int responseTypeColorIndex =
+          int.parse(responseType.toString().substring(0, 1));
+      responseTypeColor = _statusCodeColor[responseTypeColorIndex];
+    }
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5.0),
@@ -34,3 +40,4 @@ class ResponseType extends StatelessWidget {
     );
   }
 }
+

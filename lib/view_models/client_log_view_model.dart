@@ -50,6 +50,7 @@ class ClientLogViewModel with ChangeNotifier {
       _currentId++,
       value.request,
       value.response,
+      errorType: value.errorType,
     );
   }
 
@@ -157,26 +158,79 @@ class ClientLogEvent {
   static Set<OutputCallback> get getOutputCallbacks => _outputCallbacks;
 }
 
-class ClientLogInterceptorViewModel extends Interceptor {
+class ClientLogInterceptor extends Interceptor {
+  var debugPrint = (String? message,
+          {int? wrapWidth, String? currentState, dynamic time}) =>
+      debugPrintSynchronouslyWithText(
+        message!,
+        wrapWidth: wrapWidth,
+        currentState: currentState,
+        time: time,
+      );
+
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    print('REQUEST[${options.method}] => PATH: ${options.path}');
-    super.onRequest(options, handler);
+    requestTime = DateTime.now().toLocal();
+    // debugPrint('     ===== Dio Error [Start] =====',
+    //     currentState: 'Error', time: reqTime);
+    // debugPrint('     method => ${options.method}',
+    //     currentState: 'Error', time: reqTime);
+    // debugPrint('     uri => ${options.uri}',
+    //     currentState: 'Error', time: reqTime);
+    // debugPrint('     requestHeader => ${options.headers}',
+    //     currentState: 'Error', time: reqTime);
+    // debugPrint('     requestBody => ${options.data}',
+    //     currentState: 'Error', time: reqTime);
+    reqOptions = options;
+    return super.onRequest(options, handler);
   }
+
+  late DateTime requestTime;
+  late RequestOptions reqOptions;
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
-      'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-    );
-    super.onResponse(response, handler);
+    var status = response.statusMessage;
+    debugPrint('     ===== Dio $status [Start] =====',
+        currentState: status, time: requestTime);
+    debugPrint('     method => ${reqOptions.method}',
+        currentState: status, time: requestTime);
+    debugPrint('     uri => ${reqOptions.uri}',
+        currentState: status, time: requestTime);
+    debugPrint('     requestHeader => ${reqOptions.headers}',
+        currentState: status, time: requestTime);
+    debugPrint('     requestBody => ${reqOptions.data}',
+        currentState: status, time: requestTime);
+
+    DateTime responseTime = DateTime.now().toLocal();
+    debugPrint('     responseStatus => ${response.statusCode.toString()}',
+        currentState: status, time: responseTime);
+    debugPrint(
+        '     responseCorrelationId => a7aa5198-8bb3-40f3-aa30-0c0889a02222',
+        currentState: status,
+        time: responseTime);
+    debugPrint('     responseBody => ${response.data}',
+        currentState: status, time: responseTime);
+    debugPrint('     ===== Dio $status [End] =====',
+        currentState: status, time: responseTime);
+    return super.onResponse(response, handler);
   }
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    print(
-      'ERROR[${err.response?.statusCode}] => PATH: ${err.requestOptions.path}',
-    );
-    super.onError(err, handler);
+    var status = err.type.name;
+    debugPrint('     ===== Dio $status [Start] =====',
+        currentState: status, time: requestTime);
+    debugPrint('     method => ${reqOptions.method}',
+        currentState: status, time: requestTime);
+    debugPrint('     uri => ${reqOptions.uri}',
+        currentState: status, time: requestTime);
+    debugPrint('     requestHeader => ${reqOptions.headers}',
+        currentState: status, time: requestTime);
+    debugPrint('     requestBody => ${reqOptions.data}',
+        currentState: status, time: requestTime);
+    debugPrint('     ===== Dio $status [End] =====',
+        currentState: status, time: requestTime);
+    return super.onError(err, handler);
   }
 }

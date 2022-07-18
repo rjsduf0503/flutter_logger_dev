@@ -6,7 +6,7 @@ class CardHeader extends StatelessWidget {
   final String requestTime;
   final dynamic responseType;
   String requestMethod;
-  final Duration timeDifference;
+  final dynamic timeDifference;
   CardHeader(
       {Key? key,
       required this.requestTime,
@@ -18,17 +18,18 @@ class CardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String stringTimeDifference = getTimeDifference(timeDifference).toString();
-    return Row(
-      children: [
-        Text(requestTime),
-        const SizedBox(width: 5),
-        ResponseType(responseType: responseType),
-        const SizedBox(width: 5),
-        Text(requestMethod),
-        const SizedBox(width: 5),
-        Text('$stringTimeDifference ms'),
-      ],
+    return Expanded(
+      child: Row(
+        children: [
+          Text(requestTime),
+          const SizedBox(width: 5),
+          ResponseType(responseType: responseType),
+          const SizedBox(width: 5),
+          Text(requestMethod),
+          const SizedBox(width: 5),
+          Text(stringTimeDifference),
+        ],
+      ),
     );
   }
 }
-

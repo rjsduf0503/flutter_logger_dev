@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_logger/global_functions.dart';
 import 'package:intl/intl.dart';
 
 class RequestCard extends StatelessWidget {
@@ -17,7 +15,15 @@ class RequestCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildCardHeader(),
+            const Center(
+              child: Text(
+                'REQUEST',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
             _buildCardContent(),
           ],
         ),
@@ -25,25 +31,17 @@ class RequestCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCardHeader() {
-    var requestTime = DateFormat.Hms().format(request.requestTime);
-    return Row(
-      children: [
-        Text(requestTime),
-        const SizedBox(width: 5),
-        Text(request.method),
-      ],
-    );
-  }
-
   Widget _buildCardContent() {
+    var requestTime = DateFormat.Hms().format(request.requestTime);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('주소: ${request.url}'),
-        Text('쿼리 파라미터: ${request.queryParameters}'),
-        Text('요청 헤더: ${request.header}'),
-        Text('요청 본문: ${request.body}'),
+        Text('Request Time: $requestTime'),
+        Text('Request Method: ${request.method}'),
+        Text('Request URI: ${request.url}'),
+        Text('Query Parameters: ${request.queryParameters}'),
+        Text('Request Header: ${request.header}'),
+        Text('Request Body: ${request.body}'),
       ],
     );
   }

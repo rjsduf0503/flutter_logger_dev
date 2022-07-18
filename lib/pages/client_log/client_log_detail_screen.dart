@@ -14,7 +14,7 @@ class ClientLogDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     var brightness = MediaQuery.of(context).platformBrightness;
     bool dark = brightness == Brightness.dark;
-    String stringHttp = stringfyHttp(logEntry);
+    String stringHttp = stringfyHttp(logEntry, errorType: logEntry.errorType);
     return CustomMaterialApp(
       dark: dark,
       child: ListView(
@@ -27,7 +27,9 @@ class ClientLogDetailScreen extends StatelessWidget {
             stringHttp: stringHttp,
           ),
           RequestCard(request: logEntry.request),
-          ResponseCard(response: logEntry.response),
+          logEntry.response != null
+              ? ResponseCard(response: logEntry.response)
+              : const SizedBox.shrink(),
         ],
       ),
     );

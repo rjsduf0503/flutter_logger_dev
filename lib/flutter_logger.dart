@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/global_functions.dart';
 import 'package:flutter_logger/models/environments_model.dart';
 import 'package:flutter_logger/models/enums/enums.dart';
 import 'package:flutter_logger/pages/home_screen.dart';
 import 'package:flutter_logger/repositories/app_logger_repository.dart';
-import 'package:flutter_logger/view_models/app_log_test_view_model.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';
 import 'package:provider/provider.dart';
@@ -17,10 +15,6 @@ class FlutterLogger extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    debugPrint = (String? message, {int? wrapWidth}) =>
-        debugPrintSynchronouslyWithText(message!, wrapWidth: wrapWidth);
-
     FlutterError.onError = (FlutterErrorDetails details) {
       final dynamic exception = details.exception;
 
@@ -81,9 +75,6 @@ class FlutterLogger extends StatelessWidget {
         ),
         ChangeNotifierProvider<ClientLogViewModel>(
           create: (_) => ClientLogViewModel(),
-        ),
-        ChangeNotifierProvider<AppLogTestViewModel>(
-          create: (_) => AppLogTestViewModel(),
         ),
       ],
       child: MaterialApp(

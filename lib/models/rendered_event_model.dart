@@ -6,9 +6,11 @@ import 'package:flutter_logger/models/http_request_model.dart';
 class RenderedClientLogEventModel {
   final int id;
   final HttpRequestModel request;
-  final Response response;
+  final Response? response;
+  final String? errorType;
 
-  RenderedClientLogEventModel(this.id, this.request, this.response);
+  RenderedClientLogEventModel(this.id, this.request, this.response,
+      {this.errorType});
 }
 
 class RenderedAppLogEventModel {

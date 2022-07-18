@@ -18,13 +18,17 @@ class ClientLogContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dynamic stringResponseTime = logEntry.response.headers['date']?.first;
-    DateTime responseTime = DateTime.parse(stringResponseTime);
+    dynamic stringResponseTime = logEntry.response?.headers?['date']?.first;
+    dynamic responseTime =
+        stringResponseTime != null ? DateTime.parse(stringResponseTime) : null;
     String requestTime = DateFormat.Hms().format(logEntry.request.requestTime);
-    dynamic responseType = logEntry.response.statusCode;
+    dynamic responseType = logEntry.response != null
+        ? logEntry.response.statusCode
+        : logEntry.errorType;
     dynamic requestMethod = logEntry.request.method;
-    Duration timeDifference =
-        responseTime.difference(logEntry.request.requestTime);
+    dynamic timeDifference = responseTime != null
+        ? responseTime.difference(logEntry.request.requestTime)
+        : '';
     return Card(
       margin: const EdgeInsets.all(12.0),
       elevation: 4.0,

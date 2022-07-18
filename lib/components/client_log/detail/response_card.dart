@@ -1,6 +1,7 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_logger/global_functions.dart';
 import 'package:intl/intl.dart';
 
 class ResponseCard extends StatelessWidget {
@@ -9,9 +10,6 @@ class ResponseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var stringResponseTime = response.headers['date']?.first;
-    DateTime responseTime = DateTime.parse(stringResponseTime);
-    var hms = DateFormat.Hms().format(responseTime);
     return Card(
       margin: const EdgeInsets.all(12.0),
       elevation: 4.0,
@@ -20,7 +18,15 @@ class ResponseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(hms),
+            const Center(
+              child: Text(
+                'RESPONSE',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
             _buildCardContent(),
           ],
         ),
@@ -29,12 +35,28 @@ class ResponseCard extends StatelessWidget {
   }
 
   Widget _buildCardContent() {
+    var stringResponseTime = response.headers['date']?.first;
+    DateTime responseTime = DateTime.parse(stringResponseTime);
+    var hms = DateFormat.Hms().format(responseTime);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('응답 헤더: ${{response.headers}}'),
-        Text('응답 본문: ${response.data}'),
+        Text('[Response Time]  =>  $hms'),
+        Text('[Status Code]  =>  ${response.statusCode}'),
+        Text('[Status Message]  =>  ${response.statusMessage}'),
+        Text('[Response Header]  =>  ${{response.headers}}'),
+        response.requestOptions.responseType == ResponseType.json
+            ? Text('[Response Body]  =>  ${response.data}')
+            : Text(
+                '[Response Type]  =>  ${response.requestOptions.responseType}'),
+        Text('[Extras]  =>  ${response.extra}'),
       ],
     );
   }
 }
+
+
+      // response.extra
+      // response.requestOptions
+      // response.statusCode
+      //response.statusMessage
