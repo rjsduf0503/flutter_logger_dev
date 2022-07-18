@@ -30,7 +30,9 @@ class LogFilter extends StatelessWidget {
               controller: provider.filterController,
               onChanged: (s) => provider.refreshFilter(),
               decoration: InputDecoration(
-                labelText: "Filter $logType output",
+                labelText: logType == 'app log'
+                    ? 'Filter $logType output'
+                    : 'Filter $logType uri',
                 border: const OutlineInputBorder(),
               ),
             ),

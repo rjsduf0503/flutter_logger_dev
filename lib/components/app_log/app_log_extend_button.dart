@@ -11,17 +11,17 @@ class AppLogExtendButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      right: 0,
-      top: -3,
+      right: 2,
+      top: -1,
       child: InkWell(
         onTap: (() {
           provider.handleExtendLogIconClick(index);
         }),
         child: provider.extended[index]
             ? Icon(Icons.remove,
-                color: provider.refreshedBuffer[index].color)
+                color: provider.refreshedBuffer[index].color, size: 32)
             : Icon(Icons.add,
-                color: provider.refreshedBuffer[index].color),
+                color: provider.refreshedBuffer[index].color, size: 32),
       ),
     );
   }

@@ -38,9 +38,10 @@ class ClientLogContent extends StatelessWidget {
             provider: provider,
             index: index,
             position: const [6, 18],
+            color: Colors.blue.shade500,
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(64, 16, 16, 16),
+            padding: const EdgeInsets.fromLTRB(58, 16, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

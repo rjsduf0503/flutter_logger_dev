@@ -4,12 +4,14 @@ class LogCheckbox extends StatelessWidget {
   final dynamic provider;
   final int index;
   final List<double> position;
+  final Color color;
 
   const LogCheckbox(
       {Key? key,
       required this.provider,
       required this.index,
-      required this.position})
+      required this.position,
+      required this.color})
       : super(key: key);
 
   @override
@@ -17,11 +19,19 @@ class LogCheckbox extends StatelessWidget {
     return Positioned(
       left: position[0],
       top: position[1],
-      child: Checkbox(
-          value: provider.checked[index],
-          onChanged: (value) {
-            provider.handleCheckboxClick(index);
-          }),
+      child: Transform.scale(
+        scale: 1.2,
+        child: Checkbox(
+            activeColor: color,
+            side: MaterialStateBorderSide.resolveWith(
+              (states) => BorderSide(width: 2, color: color),
+            ),
+            splashRadius: 18,
+            value: provider.checked[index],
+            onChanged: (value) {
+              provider.handleCheckboxClick(index);
+            }),
+      ),
     );
   }
 }
