@@ -37,6 +37,7 @@ class ClientLogViewModel with ChangeNotifier {
 
   final ListQueue<RenderedClientLogEventModel> _renderedBuffer = ListQueue();
   List<RenderedClientLogEventModel> filteredBuffer = [];
+  List<RenderedClientLogEventModel> refreshedBuffer = [];
 
   var filterController = TextEditingController();
 
@@ -69,6 +70,16 @@ class ClientLogViewModel with ChangeNotifier {
 
   void refreshFilter() {
     filteredBuffer = getFilteredBuffer(_renderedBuffer);
+    refreshedBuffer = filteredBuffer;
+    notifyListeners();
+  }
+
+  void refreshBuffer() {
+    refreshedBuffer.clear();
+    copyText = '';
+    _renderedBuffer.clear();
+    checked = [];
+    checkedBuffer.clear();
     notifyListeners();
   }
 
@@ -103,9 +114,9 @@ class ClientLogViewModel with ChangeNotifier {
   void handleCheckboxClick(int index) {
     checked[index] = !checked[index];
     if (checked[index]) {
-      checkedBuffer.add(filteredBuffer[index]);
+      checkedBuffer.add(refreshedBuffer[index]);
     } else {
-      checkedBuffer.removeWhere((element) => element == filteredBuffer[index]);
+      checkedBuffer.removeWhere((element) => element == refreshedBuffer[index]);
     }
     checkedBuffer.sort((a, b) => a.id.compareTo(b.id));
 
@@ -128,7 +139,7 @@ class ClientLogViewModel with ChangeNotifier {
     checkedBuffer = [];
     copyText = '';
     if (!allChecked) {
-      checkedBuffer.addAll(filteredBuffer);
+      checkedBuffer.addAll(refreshedBuffer);
       if (checkedBuffer.isNotEmpty) {
         for (var element in checkedBuffer) {
           var stringHttp = stringfyHttp(element);

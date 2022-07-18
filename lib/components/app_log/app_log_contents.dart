@@ -21,8 +21,7 @@ class AppLogContents extends StatelessWidget {
           shrinkWrap: true,
           controller: provider.scrollController,
           itemBuilder: (context, index) {
-            var logEntryWithoutPrefix =
-                provider.filteredBufferWithoutPrefix[index];
+            var logEntryWithoutPrefix = provider.refreshedBuffer[index];
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -84,7 +83,7 @@ class AppLogContents extends StatelessWidget {
               ],
             );
           },
-          itemCount: provider.filteredBufferWithoutPrefix.length,
+          itemCount: provider.refreshedBuffer.length,
         ),
       ),
     );

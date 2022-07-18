@@ -12,9 +12,9 @@ class ClientLogContents extends StatelessWidget {
       child: ListView.builder(
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          return ClientLogContent(provider: provider, index: index, logEntry: provider.filteredBuffer[index]);
+          return ClientLogContent(provider: provider, index: index, logEntry: provider.refreshedBuffer[index]);
         },
-        itemCount: provider.filteredBuffer.length,
+        itemCount: provider.refreshedBuffer.length,
       ),
     );
   }

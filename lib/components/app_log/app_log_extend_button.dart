@@ -19,9 +19,9 @@ class AppLogExtendButton extends StatelessWidget {
         }),
         child: provider.extended[index]
             ? Icon(Icons.remove,
-                color: provider.filteredBufferWithoutPrefix[index].color)
+                color: provider.refreshedBuffer[index].color)
             : Icon(Icons.add,
-                color: provider.filteredBufferWithoutPrefix[index].color),
+                color: provider.refreshedBuffer[index].color),
       ),
     );
   }

@@ -34,30 +34,35 @@ class LogHeader extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          identical(consoleType, 'Client Log') ||
-                  identical(consoleType, 'App Log')
-              ? Checkbox(
-                  value: !provider.checked.contains(false) &&
-                      provider.checked.isNotEmpty,
-                  onChanged: (value) {
-                    provider.handleAllCheckboxClick();
-                  },
-                )
-              : const SizedBox.shrink(),
-          !consoleType.contains('Test')
-              ? IconButton(
-                  icon: const Icon(Icons.copy, size: 22),
-                  onPressed: () {
-                    if (consoleType == 'Client Log Detail') {
-                      Clipboard.setData(ClipboardData(text: stringHttp));
-                      showClipboardAlert(context);
-                    } else if (provider.copyText != '') {
-                      Clipboard.setData(ClipboardData(text: provider.copyText));
-                      showClipboardAlert(context);
-                    }
-                  },
-                )
-              : const SizedBox.shrink(),
+          if (identical(consoleType, 'App Log') ||
+              identical(consoleType, 'Client Log'))
+            Checkbox(
+              value: !provider.checked.contains(false) &&
+                  provider.checked.isNotEmpty,
+              onChanged: (value) {
+                provider.handleAllCheckboxClick();
+              },
+            ),
+          if (identical(consoleType, 'App Log') ||
+              identical(consoleType, 'Client Log'))
+            IconButton(
+              icon: const Icon(Icons.delete_outline, size: 28),
+              onPressed: () {
+                provider.refreshBuffer();
+              },
+            ),
+          IconButton(
+            icon: const Icon(Icons.copy, size: 22),
+            onPressed: () {
+              if (identical(consoleType, 'Client Log Detail')) {
+                Clipboard.setData(ClipboardData(text: stringHttp));
+                showClipboardAlert(context);
+              } else if (provider.copyText != '') {
+                Clipboard.setData(ClipboardData(text: provider.copyText));
+                showClipboardAlert(context);
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
