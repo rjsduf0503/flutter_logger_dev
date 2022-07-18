@@ -60,6 +60,7 @@ class AppLogViewModel with ChangeNotifier {
   late List<bool> checked = [];
 
   Level filterLevel = Level.nothing;
+  late List<Level> currentLevels = [];
 
   var _currentId = 0;
   bool _scrollListenerEnabled = true;
@@ -107,8 +108,12 @@ class AppLogViewModel with ChangeNotifier {
       followBottom = scrolledToBottom;
       notifyListeners();
     });
-    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, true);
     checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+
+    // _renderedBufferWithoutPrefix 돌면서 있는 Level만.
+    currentLevels = [];
+    // print(_renderedBufferWithoutPrefix.map((element) => element.level));
   }
 
   void didChangeDependencies() {
@@ -120,8 +125,16 @@ class AppLogViewModel with ChangeNotifier {
     for (var event in _outputEventBufferWithoutPrefix) {
       _renderedBufferWithoutPrefix.add(_renderEvent(event));
     }
-    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, true);
     checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+
+    currentLevels = [];
+    for (var item in _renderedBufferWithoutPrefix) {
+      if (!currentLevels.contains(item.level)) currentLevels.add(item.level);
+    }
+    for (var item in currentLevels) {
+      print(item.name);
+    }
     refreshFilter();
   }
 

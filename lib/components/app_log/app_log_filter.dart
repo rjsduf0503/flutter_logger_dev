@@ -26,12 +26,12 @@ class AppLogFilter extends StatelessWidget {
             value: Level.nothing,
             child: Text("ALL"),
           ),
-          for (var item in Level.values)
+          for (var item in provider.currentLevels)
             if (item != Level.nothing)
               DropdownMenuItem(
                 value: item,
                 enabled: item.index <= maxLevel.index,
-                child: Text(item.name.toUpperCase()),
+                child: Text((item as Level).name.toUpperCase()),
               )
         ],
         onChanged: (value) {
