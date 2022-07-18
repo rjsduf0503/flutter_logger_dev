@@ -29,30 +29,39 @@ class LogHeader extends StatelessWidget {
           Text(
             consoleType,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Spacer(),
           if (identical(consoleType, 'App Log') ||
               identical(consoleType, 'Client Log'))
-            Checkbox(
-              value: !provider.checked.contains(false) &&
-                  provider.checked.isNotEmpty,
-              onChanged: (value) {
-                provider.handleAllCheckboxClick();
-              },
+            Transform.scale(
+              scale: 1.2,
+              child: Checkbox(
+                side: MaterialStateBorderSide.resolveWith(
+                  (states) => const BorderSide(width: 2),
+                ),
+                splashRadius: 15,
+                value: !provider.checked.contains(false) &&
+                    provider.checked.isNotEmpty,
+                onChanged: (value) {
+                  provider.handleAllCheckboxClick();
+                },
+              ),
             ),
           if (identical(consoleType, 'App Log') ||
               identical(consoleType, 'Client Log'))
             IconButton(
-              icon: const Icon(Icons.delete_outline, size: 28),
+              splashRadius: 20,
+              icon: const Icon(Icons.delete_outline, size: 32),
               onPressed: () {
                 provider.refreshBuffer();
               },
             ),
           IconButton(
-            icon: const Icon(Icons.copy, size: 22),
+            splashRadius: 20,
+            icon: const Icon(Icons.copy, size: 26),
             onPressed: () {
               if (identical(consoleType, 'Client Log Detail')) {
                 Clipboard.setData(ClipboardData(text: stringHttp));
@@ -64,7 +73,8 @@ class LogHeader extends StatelessWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.close),
+            splashRadius: 20,
+            icon: const Icon(Icons.close, size: 32),
             onPressed: () {
               Navigator.pop(parentContext);
             },

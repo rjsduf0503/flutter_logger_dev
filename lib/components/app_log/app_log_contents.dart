@@ -39,26 +39,27 @@ class AppLogContents extends StatelessWidget {
                     children: [
                       Column(
                         children: [
-                          Center(
-                            child: Text(
-                              logEntryWithoutPrefix.level
-                                  .toString()
-                                  .split('.')
-                                  .last
-                                  .toUpperCase(),
-                              style: TextStyle(
-                                color: logEntryWithoutPrefix.color,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4.0),
+                            child: Center(
+                              child: Text(
+                                logEntryWithoutPrefix.level
+                                    .toString()
+                                    .split('.')
+                                    .last
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                  color: logEntryWithoutPrefix.color,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
                             ),
                           ),
                           provider.extended[index]
                               ? Column(
                                   children: [
-                                    const SizedBox(
-                                      height: 10,
-                                    ),
+                                    const SizedBox(height: 10),
                                     Text(
                                       logEntryWithoutPrefix.lowerCaseText,
                                       style: TextStyle(
@@ -74,7 +75,8 @@ class AppLogContents extends StatelessWidget {
                       LogCheckbox(
                         provider: provider,
                         index: index,
-                        position: const [-8, -15],
+                        position: const [-5, -10],
+                        color: logEntryWithoutPrefix.color,
                       ),
                       AppLogExtendButton(provider: provider, index: index),
                     ],

@@ -9,7 +9,7 @@ class LogBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60,
+      height: 70,
       child: Container(
         decoration: BoxDecoration(
           boxShadow: [
