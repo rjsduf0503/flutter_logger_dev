@@ -94,6 +94,9 @@ class ClientLogViewModel with ChangeNotifier {
 
     checked = List<bool>.filled(_renderedBuffer.length, false);
 
+    copyText = '';
+    filterController.text = '';
+
     refreshFilter();
   }
 
@@ -235,7 +238,6 @@ class ClientLogInterceptor extends Interceptor {
     return super.onError(err, handler);
   }
 }
-
 
 BaseOptions baseOptions = BaseOptions(
   baseUrl: "https://reqres.in/api",

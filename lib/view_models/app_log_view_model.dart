@@ -111,9 +111,7 @@ class AppLogViewModel with ChangeNotifier {
     extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, true);
     checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
 
-    // _renderedBufferWithoutPrefix 돌면서 있는 Level만.
     currentLevels = [];
-    // print(_renderedBufferWithoutPrefix.map((element) => element.level));
   }
 
   void didChangeDependencies() {
@@ -132,9 +130,11 @@ class AppLogViewModel with ChangeNotifier {
     for (var item in _renderedBufferWithoutPrefix) {
       if (!currentLevels.contains(item.level)) currentLevels.add(item.level);
     }
-    for (var item in currentLevels) {
-      print(item.name);
-    }
+
+    copyText = '';
+    filterLevel = Level.nothing;
+    filterController.text = '';
+
     refreshFilter();
   }
 
