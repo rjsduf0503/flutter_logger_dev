@@ -115,21 +115,23 @@ class ClientLoggerRepository {
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
   }) async {
-    BaseOptions dioOptions =
-        baseOptions.copyWith(queryParameters: queryParameters, method: type);
+    BaseOptions dioOptions = baseOptions.copyWith(
+      queryParameters: queryParameters,
+      method: type,
+    );
     final dio = Dio(dioOptions)
       ..interceptors.add(
-        ClientLogInterceptorViewModel(),
+        ClientLogInterceptor(),
       );
+    DateTime requestTime = DateTime.now().toLocal();
+    var request = HttpRequestModel(
+        requestTime,
+        dio.options.method,
+        dio.options.baseUrl + url,
+        dio.options.queryParameters,
+        dio.options.headers,
+        data);
     try {
-      DateTime requestTime = DateTime.now().toLocal();
-      var request = HttpRequestModel(
-          requestTime,
-          dio.options.method,
-          dio.options.baseUrl + url,
-          dio.options.queryParameters,
-          dio.options.headers,
-          data);
       Response response = await dio.request(
         url,
         data: data,
@@ -141,13 +143,19 @@ class ClientLoggerRepository {
       DateTime responseTime = DateTime.now().toLocal();
       response.headers['date']?[0] = responseTime.toString();
       var returnValue = HttpModel(request, response);
-      Set<OutputCallback> outputCallbacks =
-          ClientLogEvent.getOutputCallbacks;
+      Set<OutputCallback> outputCallbacks = ClientLogEvent.getOutputCallbacks;
       for (var callback in outputCallbacks) {
         callback(returnValue);
       }
-    } catch (e) {
-      print("Exception: $e");
+    } on DioError catch (error) {
+      var returnValue =
+          HttpModel(request, error.response, errorType: error.type.name);
+      Set<OutputCallback> outputCallbacks = ClientLogEvent.getOutputCallbacks;
+      for (var callback in outputCallbacks) {
+        callback(returnValue);
+      }
+    } on Error catch (error) {
+      print(error);
     }
   }
 }

@@ -39,7 +39,14 @@ class Fab extends StatelessWidget {
             label: 'App Log Test',
             onTap: () {
               routing.handleRouting(context, 'App Log Test');
-              print('Client Log Tapped');
+              print('App Log Test Tapped');
+            }),
+        SpeedDialChild(
+            child: const Icon(Icons.add_circle),
+            label: 'Client Log Test',
+            onTap: () {
+              routing.handleRouting(context, 'Client Log Test');
+              print('Client Log Test Tapped');
             }),
       ],
     );
