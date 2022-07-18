@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/fab.dart';
-
+import 'package:flutter_logger/components/log_test/log_test.dart';
 
 class HomeScreen extends StatelessWidget {
   ValueNotifier<bool> isDialOpen = ValueNotifier(false);
@@ -19,16 +19,7 @@ class HomeScreen extends StatelessWidget {
         }
       },
       child: Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                'Flutter Logger Home',
-              ),
-            ],
-          ),
-        ),
+        body: const SafeArea(child: LogTest()),
         floatingActionButton: Fab(isDialOpen: isDialOpen),
       ),
     );

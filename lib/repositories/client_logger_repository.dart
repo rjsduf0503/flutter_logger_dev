@@ -20,12 +20,14 @@ class ClientLoggerRepository {
     Options? options,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
+    int? timeout,
   }) {
     doDio('GET', url,
         queryParameters: queryParameters,
         options: options,
         cancelToken: cancelToken,
-        onReceiveProgress: onReceiveProgress);
+        onReceiveProgress: onReceiveProgress,
+        timeout: timeout);
   }
 
   void post(
@@ -114,11 +116,19 @@ class ClientLoggerRepository {
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
     ProgressCallback? onReceiveProgress,
+    int? timeout,
   }) async {
-    BaseOptions dioOptions = baseOptions.copyWith(
-      queryParameters: queryParameters,
-      method: type,
-    );
+    BaseOptions dioOptions = timeout == null
+        ? baseOptions.copyWith(
+            queryParameters: queryParameters,
+            method: type,
+          )
+        : baseOptions.copyWith(
+            queryParameters: queryParameters,
+            method: type,
+            connectTimeout: timeout,
+            receiveTimeout: timeout,
+          );
     final dio = Dio(dioOptions)
       ..interceptors.add(
         ClientLogInterceptor(),

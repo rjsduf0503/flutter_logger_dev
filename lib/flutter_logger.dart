@@ -4,11 +4,13 @@ import 'package:flutter_logger/models/environments_model.dart';
 import 'package:flutter_logger/models/enums/enums.dart';
 import 'package:flutter_logger/pages/home_screen.dart';
 import 'package:flutter_logger/repositories/app_logger_repository.dart';
+import 'package:flutter_logger/repositories/client_logger_repository.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';
 import 'package:provider/provider.dart';
 
 AppLoggerRepository appLogger = AppLoggerRepository();
+ClientLoggerRepository clientLogger = ClientLoggerRepository();
 
 class FlutterLogger extends StatelessWidget {
   const FlutterLogger({Key? key}) : super(key: key);
