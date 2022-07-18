@@ -1,12 +1,14 @@
 import 'dart:collection';
+import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/environments_model.dart';
+import 'package:flutter_logger/models/log_event_model.dart';
 import 'package:flutter_logger/models/log_printer_model.dart';
 import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
-import 'dart:convert';
-import 'package:flutter_logger/models/log_event_model.dart';
 
 ListQueue<OutputEventModel> _outputEventBuffer = ListQueue();
 ListQueue<OutputEventModel> _outputEventBufferWithoutPrefix = ListQueue();
@@ -232,6 +234,83 @@ class AppLogViewModel with ChangeNotifier {
     AppLogEvent.removeOutputListener(_callback);
     AppLogEvent.removeOutputListener(_callbackWithoutPrefix);
     super.dispose();
+  }
+}
+
+class AppLogger {
+  static Level level = Level.nothing;
+  final LogPrinterModel _printer;
+  bool _active = true;
+
+  AppLogger({
+    LogPrinterModel? printer,
+    Level? level,
+  }) : _printer = printer ?? LogPrinter();
+
+  /// Log a message at level [Level.verbose].
+  void v(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    log(Level.verbose, message, error, stackTrace);
+  }
+
+  /// Log a message at level [Level.debug].
+  void d(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    log(Level.debug, message, error, stackTrace);
+  }
+
+  /// Log a message at level [Level.info].
+  void i(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    log(Level.info, message, error, stackTrace);
+  }
+
+  /// Log a message at level [Level.warning].
+  void w(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    log(Level.warning, message, error, stackTrace);
+  }
+
+  /// Log a message at level [Level.error].
+  void e(dynamic message, [dynamic error, StackTrace? stackTrace]) {
+    log(Level.error, message, error, stackTrace);
+  }
+
+  /// Log a message with [level].
+  void log(Level level, dynamic message,
+      [dynamic error, StackTrace? stackTrace]) {
+    if (!_active) {
+      throw ArgumentError('Logger has already been closed.');
+    } else if (error != null && error is StackTrace) {
+      throw ArgumentError('Error parameter cannot take a StackTrace!');
+    } else if (level == Level.nothing) {
+      throw ArgumentError('Log events cannot have Level.nothing');
+    }
+    if (level.index > EnvironmentsModel.getMaxDisplayLevel.index) return;
+    var logEvent = LogEventModel(level, message, error, stackTrace);
+    List<String> output = _printer.log(logEvent, false);
+    List<String> outputWithoutPrefix = _printer.log(logEvent, true);
+    Set<OutputCallbackWithoutPrefix> outputCallbackWithoutPrefix =
+        AppLogEvent.getOutputCallbacksWithoutPrefix;
+
+    if (outputWithoutPrefix.isNotEmpty) {
+      var outputEventWithoutPrefix =
+          OutputEventModel(level, outputWithoutPrefix);
+      for (var callback in outputCallbackWithoutPrefix) {
+        callback(outputEventWithoutPrefix);
+      }
+      if (output.isNotEmpty) {
+        try {
+          for (var item in output) {
+            developer.log(item);
+          }
+        } catch (e, s) {
+          print(e);
+          print(s);
+        }
+      }
+    }
+  }
+
+  void close() {
+    _active = false;
+    _printer.destroy();
   }
 }
 
