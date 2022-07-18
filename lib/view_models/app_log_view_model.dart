@@ -10,7 +10,7 @@ import 'package:flutter_logger/models/log_printer_model.dart';
 import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
 
-ListQueue<OutputEventModel> _outputEventBuffer = ListQueue();
+// ListQueue<OutputEventModel> _outputEventBuffer = ListQueue();
 ListQueue<OutputEventModel> _outputEventBufferWithoutPrefix = ListQueue();
 int _bufferSize = 100;
 bool _initialized = false;
@@ -28,12 +28,12 @@ class AppLogViewModel with ChangeNotifier {
 
     _bufferSize = bufferSize;
     _initialized = true;
-    AppLogEvent.addOutputListener((event) {
-      if (_outputEventBuffer.length == bufferSize) {
-        _outputEventBuffer.removeFirst();
-      }
-      _outputEventBuffer.add(event);
-    });
+    // AppLogEvent.addOutputListener((event) {
+    //   if (_outputEventBuffer.length == bufferSize) {
+    //     _outputEventBuffer.removeFirst();
+    //   }
+    //   _outputEventBuffer.add(event);
+    // });
     AppLogEvent.addOutputListenerWithoutPrefix((event) {
       if (_outputEventBufferWithoutPrefix.length == bufferSize) {
         _outputEventBufferWithoutPrefix.removeFirst();
@@ -45,11 +45,11 @@ class AppLogViewModel with ChangeNotifier {
   late OutputCallback _callback;
   late OutputCallbackWithoutPrefix _callbackWithoutPrefix;
 
-  final ListQueue<RenderedAppLogEventModel> _renderedBuffer = ListQueue();
+  // final ListQueue<RenderedAppLogEventModel> _renderedBuffer = ListQueue();
   final ListQueue<RenderedAppLogEventModel> _renderedBufferWithoutPrefix =
       ListQueue();
-  List<RenderedAppLogEventModel> filteredBuffer = [];
   List<RenderedAppLogEventModel> filteredBufferWithoutPrefix = [];
+  List<RenderedAppLogEventModel> refreshedBuffer = [];
   List<RenderedAppLogEventModel> checkedBuffer = [];
   String copyText = '';
 
@@ -79,14 +79,14 @@ class AppLogViewModel with ChangeNotifier {
   };
 
   void initState() {
-    _callback = (e) {
-      if (_renderedBuffer.length == _bufferSize) {
-        _renderedBuffer.removeFirst();
-      }
+    // _callback = (e) {
+    //   if (_renderedBuffer.length == _bufferSize) {
+    //     _renderedBuffer.removeFirst();
+    //   }
 
-      _renderedBuffer.add(_renderEvent(e));
-      refreshFilter();
-    };
+    //   _renderedBuffer.add(_renderEvent(e));
+    //   refreshFilter();
+    // };
 
     _callbackWithoutPrefix = (e) {
       if (_renderedBufferWithoutPrefix.length == _bufferSize) {
@@ -97,7 +97,7 @@ class AppLogViewModel with ChangeNotifier {
       refreshFilter();
     };
 
-    AppLogEvent.addOutputListener(_callback);
+    // AppLogEvent.addOutputListener(_callback);
     AppLogEvent.addOutputListener(_callbackWithoutPrefix);
 
     scrollController.addListener(() {
@@ -115,10 +115,10 @@ class AppLogViewModel with ChangeNotifier {
   }
 
   void didChangeDependencies() {
-    _renderedBuffer.clear();
-    for (var event in _outputEventBuffer) {
-      _renderedBuffer.add(_renderEvent(event));
-    }
+    // _renderedBuffer.clear();
+    // for (var event in _outputEventBuffer) {
+    //   _renderedBuffer.add(_renderEvent(event));
+    // }
     _renderedBufferWithoutPrefix.clear();
     for (var event in _outputEventBufferWithoutPrefix) {
       _renderedBufferWithoutPrefix.add(_renderEvent(event));
@@ -156,16 +156,23 @@ class AppLogViewModel with ChangeNotifier {
   }
 
   void refreshFilter() {
-    var newFilteredBuffer = getFilteredBuffer(_renderedBuffer);
-    var newFilteredBufferWithoutPrefix =
+    filteredBufferWithoutPrefix =
         getFilteredBuffer(_renderedBufferWithoutPrefix);
-
-    filteredBuffer = newFilteredBuffer;
-    filteredBufferWithoutPrefix = newFilteredBufferWithoutPrefix;
+    ;
+    refreshedBuffer = filteredBufferWithoutPrefix;
 
     if (followBottom) {
       Future.delayed(Duration.zero, scrollToBottom);
     }
+  }
+
+  void refreshBuffer() {
+    refreshedBuffer.clear();
+    copyText = '';
+    _renderedBufferWithoutPrefix.clear();
+    checked = [];
+    checkedBuffer.clear();
+    notifyListeners();
   }
 
   void handleExtendLogIconClick(int index) {
@@ -176,10 +183,9 @@ class AppLogViewModel with ChangeNotifier {
   void handleCheckboxClick(int index) {
     checked[index] = !checked[index];
     if (checked[index]) {
-      checkedBuffer.add(filteredBufferWithoutPrefix[index]);
+      checkedBuffer.add(refreshedBuffer[index]);
     } else {
-      checkedBuffer.removeWhere(
-          (element) => element == filteredBufferWithoutPrefix[index]);
+      checkedBuffer.removeWhere((element) => element == refreshedBuffer[index]);
     }
     checkedBuffer.sort((a, b) => a.id.compareTo(b.id));
 
@@ -202,7 +208,7 @@ class AppLogViewModel with ChangeNotifier {
     checkedBuffer = [];
     copyText = '';
     if (!allChecked) {
-      checkedBuffer.addAll(filteredBufferWithoutPrefix);
+      checkedBuffer.addAll(refreshedBuffer);
       if (checkedBuffer.isNotEmpty) {
         for (var element in checkedBuffer) {
           copyText += checkedBuffer.last == element
