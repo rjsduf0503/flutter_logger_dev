@@ -21,6 +21,12 @@ class Fab extends StatelessWidget {
       spaceBetweenChildren: 10,
       children: [
         SpeedDialChild(
+            child: const Icon(Icons.wysiwyg),
+            label: 'Log',
+            onTap: () {
+              routing.handleRouting(context, 'Log');
+            }),
+        SpeedDialChild(
             child: const Icon(Icons.last_page_outlined),
             label: 'App Log',
             onTap: () {
