@@ -5,6 +5,7 @@ import 'package:flutter_logger/models/enums/enums.dart';
 import 'package:flutter_logger/pages/home_screen.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';
+import 'package:flutter_logger/view_models/log_view_model.dart';
 import 'package:provider/provider.dart';
 
 AppLogger appLogger = AppLogger();
@@ -67,6 +68,7 @@ class FlutterLogger extends StatelessWidget {
 
     AppLogViewModel.init();
     ClientLogViewModel.init();
+    LogViewModel.init();
 
     return MultiProvider(
       providers: [
@@ -75,6 +77,9 @@ class FlutterLogger extends StatelessWidget {
         ),
         ChangeNotifierProvider<ClientLogViewModel>(
           create: (_) => ClientLogViewModel(),
+        ),
+        ChangeNotifierProvider<LogViewModel>(
+          create: (_) => LogViewModel(),
         ),
       ],
       child: MaterialApp(

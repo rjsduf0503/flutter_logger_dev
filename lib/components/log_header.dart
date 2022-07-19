@@ -35,7 +35,8 @@ class LogHeader extends StatelessWidget {
           ),
           const Spacer(),
           if (identical(consoleType, 'App Log') ||
-              identical(consoleType, 'Client Log'))
+              identical(consoleType, 'Client Log') ||
+              identical(consoleType, 'Log'))
             Transform.scale(
               scale: 1.2,
               child: Checkbox(
@@ -48,15 +49,15 @@ class LogHeader extends StatelessWidget {
                   ),
                 ),
                 splashRadius: 15,
-                value: !provider.checked.contains(false) &&
-                    provider.checked.isNotEmpty,
+                value: provider.allChecked,
                 onChanged: (value) {
                   provider.handleAllCheckboxClick();
                 },
               ),
             ),
           if (identical(consoleType, 'App Log') ||
-              identical(consoleType, 'Client Log'))
+              identical(consoleType, 'Client Log') ||
+              identical(consoleType, 'Log'))
             IconButton(
               splashRadius: 20,
               icon: const Icon(Icons.delete_outline, size: 32),

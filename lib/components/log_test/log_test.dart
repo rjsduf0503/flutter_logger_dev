@@ -84,6 +84,7 @@ class LogTest extends StatelessWidget {
                   pressEvent: () {
                     clientLogger.get('/users/2');
                   },
+                  buttonColor: Colors.green,
                 ),
                 ElevatedColorButton(
                   text: 'Get Failed',
@@ -99,6 +100,7 @@ class LogTest extends StatelessWidget {
                       data: {"name": "morpheus", "job": "leader"},
                     );
                   },
+                  buttonColor: Colors.green,
                 ),
                 ElevatedColorButton(
                   text: 'Post Failed',
@@ -117,6 +119,7 @@ class LogTest extends StatelessWidget {
                       data: {"name": "morpheus", "job": "zion resident"},
                     );
                   },
+                  buttonColor: Colors.green,
                 ),
                 ElevatedColorButton(
                   text: 'Put Failed',
@@ -135,6 +138,7 @@ class LogTest extends StatelessWidget {
                       data: {"name": "morpheus", "job": "zion resident"},
                     );
                   },
+                  buttonColor: Colors.green,
                 ),
                 ElevatedColorButton(
                   text: 'Patch Failed',
@@ -150,6 +154,7 @@ class LogTest extends StatelessWidget {
                   pressEvent: () {
                     clientLogger.delete('/users/2');
                   },
+                  buttonColor: Colors.green,
                 ),
                 ElevatedColorButton(
                   text: 'Delete Failed',
@@ -158,7 +163,7 @@ class LogTest extends StatelessWidget {
                   },
                 ),
                 ElevatedColorButton(
-                  text: 'Time out(Failed)',
+                  text: 'Time out',
                   pressEvent: () {
                     clientLogger.get('/users/2', timeout: 1);
                   },

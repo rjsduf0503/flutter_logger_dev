@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_logger/pages/app_log_screen.dart';
 import 'package:flutter_logger/pages/client_log/client_log_detail_screen.dart';
 import 'package:flutter_logger/pages/client_log/client_log_screen.dart';
+import 'package:flutter_logger/pages/log_screen.dart';
 
 void handleRouting(context, item, {logEntry}) {
   Navigator.of(context).push(PageRouteBuilder(
@@ -39,6 +40,8 @@ class Routing extends StatelessWidget {
         return const ClientLogScreen();
       case "Client Log Detail":
         return ClientLogDetailScreen(logEntry: logEntry);
+      case 'Log':
+        return const LogScreen();
       default:
         return const SizedBox.shrink();
     }
