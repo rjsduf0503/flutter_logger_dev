@@ -21,7 +21,8 @@ class AppLogContents extends StatelessWidget {
           shrinkWrap: true,
           controller: provider.scrollController,
           itemBuilder: (context, index) {
-            var logEntryWithoutPrefix = provider.refreshedBuffer[index];
+            var logEntryWithoutPrefix =
+                provider.refreshedBuffer[index].logEntry;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -56,7 +57,7 @@ class AppLogContents extends StatelessWidget {
                               ),
                             ),
                           ),
-                          provider.extended[index]
+                          provider.refreshedBuffer[index].extended
                               ? Column(
                                   children: [
                                     const SizedBox(height: 10),

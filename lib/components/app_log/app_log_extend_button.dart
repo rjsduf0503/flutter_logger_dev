@@ -17,11 +17,12 @@ class AppLogExtendButton extends StatelessWidget {
         onTap: (() {
           provider.handleExtendLogIconClick(index);
         }),
-        child: provider.extended[index]
+        child: provider.refreshedBuffer[index].extended
             ? Icon(Icons.remove,
-                color: provider.refreshedBuffer[index].color, size: 32)
+                color: provider.refreshedBuffer[index].logEntry.color, size: 32)
             : Icon(Icons.add,
-                color: provider.refreshedBuffer[index].color, size: 32),
+                color: provider.refreshedBuffer[index].logEntry.color,
+                size: 32),
       ),
     );
   }

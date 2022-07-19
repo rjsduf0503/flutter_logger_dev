@@ -36,7 +36,7 @@ class AppLogFilter extends StatelessWidget {
         ],
         onChanged: (value) {
           provider.filterLevel = value as Level;
-          provider.refreshFilter();
+          provider.filterControl();
         },
       ),
       logType: 'app log',

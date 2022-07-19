@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/global_functions.dart';
+import 'package:flutter_logger/models/checked_log_entry_model.dart';
 import 'package:flutter_logger/models/http_model.dart';
 import 'package:flutter_logger/models/http_request_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_logger/models/rendered_event_model.dart';
 ListQueue<HttpModel> _outputEventBuffer = ListQueue();
 bool _initialized = false;
 int _bufferSize = 100;
+var _currentId = 0;
 
 class ClientLogViewModel with ChangeNotifier {
   static final ClientLogViewModel _clientLogConsoleViewModel =
@@ -36,52 +38,14 @@ class ClientLogViewModel with ChangeNotifier {
   late OutputCallback _callback;
 
   final ListQueue<RenderedClientLogEventModel> _renderedBuffer = ListQueue();
-  List<RenderedClientLogEventModel> filteredBuffer = [];
-  List<RenderedClientLogEventModel> refreshedBuffer = [];
+  List filteredBuffer = [];
+  List refreshedBuffer = [];
 
   var filterController = TextEditingController();
+  bool allChecked = false;
 
-  var _currentId = 0;
-
-  late List<bool> checked = [];
-  List<RenderedClientLogEventModel> checkedBuffer = [];
   String copyText = '';
-
-  RenderedClientLogEventModel _renderEvent(HttpModel value) {
-    return RenderedClientLogEventModel(
-      _currentId++,
-      value.request,
-      value.response,
-      errorType: value.errorType,
-    );
-  }
-
-  List<RenderedClientLogEventModel> getFilteredBuffer(
-      ListQueue<RenderedClientLogEventModel> renderedBuffer) {
-    return renderedBuffer.where((it) {
-      if (filterController.text.isNotEmpty) {
-        var filterText = filterController.text.toLowerCase();
-        return it.request.url.contains(filterText);
-      } else {
-        return true;
-      }
-    }).toList();
-  }
-
-  void refreshFilter() {
-    filteredBuffer = getFilteredBuffer(_renderedBuffer);
-    refreshedBuffer = filteredBuffer;
-    notifyListeners();
-  }
-
-  void refreshBuffer() {
-    refreshedBuffer.clear();
-    copyText = '';
-    _renderedBuffer.clear();
-    checked = [];
-    checkedBuffer.clear();
-    notifyListeners();
-  }
+  List<CheckedLogEntryModel> checked = [];
 
   void initState() {
     _callback = (event) {
@@ -94,38 +58,112 @@ class ClientLogViewModel with ChangeNotifier {
 
     ClientLogEvent.addOutputListener(_callback);
 
-    checked = List<bool>.filled(_renderedBuffer.length, false);
+    checked = List<CheckedLogEntryModel>.generate(
+        _renderedBuffer.length, (index) => CheckedLogEntryModel());
+    allChecked = false;
+
+    var temp = 0;
+    for (var item in _renderedBuffer) {
+      checked[temp++].logEntry = item;
+    }
   }
 
   void didChangeDependencies() {
     _renderedBuffer.clear();
+
     for (var event in _outputEventBuffer) {
       _renderedBuffer.add(_renderEvent(event));
     }
 
-    checked = List<bool>.filled(_renderedBuffer.length, false);
+    checked = List<CheckedLogEntryModel>.generate(
+        _renderedBuffer.length, (index) => CheckedLogEntryModel());
+    allChecked = false;
+
+    var temp = 0;
+    for (var item in _renderedBuffer) {
+      checked[temp++].logEntry = item;
+    }
 
     copyText = '';
     filterController.text = '';
+    allChecked = false;
 
     refreshFilter();
   }
 
-  void handleCheckboxClick(int index) {
-    checked[index] = !checked[index];
-    if (checked[index]) {
-      checkedBuffer.add(refreshedBuffer[index]);
-    } else {
-      checkedBuffer.removeWhere((element) => element == refreshedBuffer[index]);
-    }
-    checkedBuffer.sort((a, b) => a.id.compareTo(b.id));
+  @override
+  void dispose() {
+    ClientLogEvent.removeOutputListener(_callback);
+    super.dispose();
+  }
 
+  RenderedClientLogEventModel _renderEvent(HttpModel value) {
+    return RenderedClientLogEventModel(
+      _currentId++,
+      value.request,
+      value.response,
+      errorType: value.errorType,
+    );
+  }
+
+  List getFilteredBuffer(List list) {
+    return list.where((it) {
+      if (filterController.text.isNotEmpty) {
+        var filterText = filterController.text.toLowerCase();
+        return it.logEntry.request.url.contains(filterText);
+      } else {
+        return true;
+      }
+    }).toList();
+  }
+
+  void refreshFilter() {
+    filteredBuffer = getFilteredBuffer(checked);
+    refreshedBuffer = filteredBuffer;
+    notifyListeners();
+  }
+
+  void filterControl() {
+    refreshFilter();
+    allChecked = true;
     copyText = '';
-    if (checkedBuffer.isNotEmpty) {
-      for (var element in checkedBuffer) {
-        var stringHttp = stringfyHttp(element);
+    if (refreshedBuffer.isEmpty) {
+      allChecked = false;
+    } else {
+      for (var element in refreshedBuffer) {
+        if (element.checked) {
+          var stringHttp = stringfyHttp(element.logEntry);
+          copyText +=
+              refreshedBuffer.last == element ? stringHttp : '$stringHttp\n\n';
+        } else {
+          allChecked = false;
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  void refreshBuffer() {
+    refreshedBuffer = [];
+    copyText = '';
+    _renderedBuffer.clear();
+    checked = [];
+    allChecked = false;
+    notifyListeners();
+  }
+
+  void handleCheckboxClick(int index, bool value) {
+    refreshedBuffer[index].checked = value;
+    allChecked = true;
+    copyText = '';
+
+    for (var element in refreshedBuffer) {
+      if (element.checked) {
+        var stringHttp = stringfyHttp(element.logEntry);
         copyText +=
-            checkedBuffer.last == element ? stringHttp : '$stringHttp\n\n';
+            refreshedBuffer.last == element ? stringHttp : '$stringHttp\n\n';
+      } else {
+        allChecked = false;
       }
     }
 
@@ -133,27 +171,24 @@ class ClientLogViewModel with ChangeNotifier {
   }
 
   void handleAllCheckboxClick() {
-    bool allChecked = !checked.contains(false);
-    checked.fillRange(0, checked.length, !allChecked);
+    for (var item in refreshedBuffer) {
+      item.checked = !allChecked;
+    }
 
-    checkedBuffer = [];
+    allChecked = !allChecked;
+
     copyText = '';
-    if (!allChecked) {
-      checkedBuffer.addAll(refreshedBuffer);
-      if (checkedBuffer.isNotEmpty) {
-        for (var element in checkedBuffer) {
-          var stringHttp = stringfyHttp(element);
+    if (allChecked) {
+      for (var element in refreshedBuffer) {
+        if (element.checked) {
+          var stringHttp = stringfyHttp(element.logEntry);
           copyText +=
-              checkedBuffer.last == element ? stringHttp : '$stringHttp\n\n';
+              refreshedBuffer.last == element ? stringHttp : '$stringHttp\n\n';
         }
       }
     }
 
     notifyListeners();
-  }
-
-  void dispose() {
-    ClientLogEvent.removeOutputListener(_callback);
   }
 }
 
