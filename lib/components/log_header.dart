@@ -39,8 +39,13 @@ class LogHeader extends StatelessWidget {
             Transform.scale(
               scale: 1.2,
               child: Checkbox(
+                checkColor: dark ? Colors.black : Colors.white,
+                activeColor: dark ? Colors.white : Colors.black,
                 side: MaterialStateBorderSide.resolveWith(
-                  (states) => const BorderSide(width: 2),
+                  (states) => BorderSide(
+                    width: 2,
+                    color: dark ? Colors.white : Colors.black,
+                  ),
                 ),
                 splashRadius: 15,
                 value: !provider.checked.contains(false) &&
