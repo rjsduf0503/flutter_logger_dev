@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/models/checked_log_entry_model.dart';
 import 'package:flutter_logger/models/enums/enums.dart';
 import 'package:flutter_logger/models/environments_model.dart';
 import 'package:flutter_logger/models/log_event_model.dart';
@@ -10,10 +11,10 @@ import 'package:flutter_logger/models/log_printer_model.dart';
 import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
 
-// ListQueue<OutputEventModel> _outputEventBuffer = ListQueue();
 ListQueue<OutputEventModel> _outputEventBufferWithoutPrefix = ListQueue();
 int _bufferSize = 100;
 bool _initialized = false;
+var _currentId = 0;
 
 class AppLogViewModel with ChangeNotifier {
   static final AppLogViewModel _appLogConsoleViewModel =
@@ -28,12 +29,7 @@ class AppLogViewModel with ChangeNotifier {
 
     _bufferSize = bufferSize;
     _initialized = true;
-    // AppLogEvent.addOutputListener((event) {
-    //   if (_outputEventBuffer.length == bufferSize) {
-    //     _outputEventBuffer.removeFirst();
-    //   }
-    //   _outputEventBuffer.add(event);
-    // });
+
     AppLogEvent.addOutputListenerWithoutPrefix((event) {
       if (_outputEventBufferWithoutPrefix.length == bufferSize) {
         _outputEventBufferWithoutPrefix.removeFirst();
@@ -42,27 +38,23 @@ class AppLogViewModel with ChangeNotifier {
     });
   }
 
-  late OutputCallback _callback;
   late OutputCallbackWithoutPrefix _callbackWithoutPrefix;
 
-  // final ListQueue<RenderedAppLogEventModel> _renderedBuffer = ListQueue();
   final ListQueue<RenderedAppLogEventModel> _renderedBufferWithoutPrefix =
       ListQueue();
-  List<RenderedAppLogEventModel> filteredBufferWithoutPrefix = [];
-  List<RenderedAppLogEventModel> refreshedBuffer = [];
-  List<RenderedAppLogEventModel> checkedBuffer = [];
-  String copyText = '';
+  List filteredBufferWithoutPrefix = [];
+  List refreshedBuffer = [];
 
-  final scrollController = ScrollController();
   final filterController = TextEditingController();
+  final scrollController = ScrollController();
+  bool allChecked = false;
 
-  late List<bool> extended = [];
-  late List<bool> checked = [];
+  String copyText = '';
+  List<CheckedAndExtendedLogEntryModel> checked = [];
 
   Level filterLevel = Level.nothing;
   late List<Level> currentLevels = [];
 
-  var _currentId = 0;
   bool _scrollListenerEnabled = true;
   bool followBottom = true;
 
@@ -79,25 +71,15 @@ class AppLogViewModel with ChangeNotifier {
   };
 
   void initState() {
-    // _callback = (e) {
-    //   if (_renderedBuffer.length == _bufferSize) {
-    //     _renderedBuffer.removeFirst();
-    //   }
-
-    //   _renderedBuffer.add(_renderEvent(e));
-    //   refreshFilter();
-    // };
-
-    _callbackWithoutPrefix = (e) {
+    _callbackWithoutPrefix = (event) {
       if (_renderedBufferWithoutPrefix.length == _bufferSize) {
         _renderedBufferWithoutPrefix.removeFirst();
       }
 
-      _renderedBufferWithoutPrefix.add(_renderEvent(e));
+      _renderedBufferWithoutPrefix.add(_renderEvent(event));
       refreshFilter();
     };
 
-    // AppLogEvent.addOutputListener(_callback);
     AppLogEvent.addOutputListener(_callbackWithoutPrefix);
 
     scrollController.addListener(() {
@@ -108,23 +90,33 @@ class AppLogViewModel with ChangeNotifier {
       followBottom = scrolledToBottom;
       notifyListeners();
     });
-    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, true);
-    checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
-
     currentLevels = [];
+
+    checked = List<CheckedAndExtendedLogEntryModel>.generate(
+        _renderedBufferWithoutPrefix.length,
+        (index) => CheckedAndExtendedLogEntryModel());
+    allChecked = false;
+
+    var temp = 0;
+    for (var item in _renderedBufferWithoutPrefix) {
+      checked[temp++].logEntry = item;
+    }
   }
 
   void didChangeDependencies() {
-    // _renderedBuffer.clear();
-    // for (var event in _outputEventBuffer) {
-    //   _renderedBuffer.add(_renderEvent(event));
-    // }
     _renderedBufferWithoutPrefix.clear();
+
     for (var event in _outputEventBufferWithoutPrefix) {
       _renderedBufferWithoutPrefix.add(_renderEvent(event));
     }
-    extended = List<bool>.filled(_renderedBufferWithoutPrefix.length, true);
-    checked = List<bool>.filled(_renderedBufferWithoutPrefix.length, false);
+
+    checked = List<CheckedAndExtendedLogEntryModel>.generate(
+        _renderedBufferWithoutPrefix.length,
+        (index) => CheckedAndExtendedLogEntryModel());
+    var temp = 0;
+    for (var item in _renderedBufferWithoutPrefix) {
+      checked[temp++].logEntry = item;
+    }
 
     currentLevels = [];
     for (var item in _renderedBufferWithoutPrefix) {
@@ -134,21 +126,27 @@ class AppLogViewModel with ChangeNotifier {
     copyText = '';
     filterLevel = Level.nothing;
     filterController.text = '';
+    allChecked = false;
 
     refreshFilter();
   }
 
-  List<RenderedAppLogEventModel> getFilteredBuffer(
-      ListQueue<RenderedAppLogEventModel> renderedBuffer) {
-    return renderedBuffer.where((it) {
+  @override
+  void dispose() {
+    AppLogEvent.removeOutputListener(_callbackWithoutPrefix);
+    super.dispose();
+  }
+
+  List getFilteredBuffer(List list) {
+    return list.where((it) {
       var logLevelMatches = filterLevel.name == 'nothing'
-          ? it.level.index <= filterLevel.index
-          : it.level.index == filterLevel.index;
+          ? it.logEntry.level.index <= filterLevel.index
+          : it.logEntry.level.index == filterLevel.index;
       if (!logLevelMatches) {
         return false;
       } else if (filterController.text.isNotEmpty) {
         var filterText = filterController.text.toLowerCase();
-        return it.lowerCaseText.contains(filterText);
+        return it.logEntry.lowerCaseText.contains(filterText);
       } else {
         return true;
       }
@@ -156,9 +154,7 @@ class AppLogViewModel with ChangeNotifier {
   }
 
   void refreshFilter() {
-    filteredBufferWithoutPrefix =
-        getFilteredBuffer(_renderedBufferWithoutPrefix);
-    ;
+    filteredBufferWithoutPrefix = getFilteredBuffer(checked);
     refreshedBuffer = filteredBufferWithoutPrefix;
 
     if (followBottom) {
@@ -166,35 +162,50 @@ class AppLogViewModel with ChangeNotifier {
     }
   }
 
+  void filterControl() {
+    refreshFilter();
+    allChecked = true;
+    copyText = '';
+    if (refreshedBuffer.isEmpty) {
+      allChecked = false;
+    } else {
+      for (var element in refreshedBuffer) {
+        if (element.checked) {
+          var text = element.logEntry.lowerCaseText;
+          copyText += refreshedBuffer.last == element ? text : '$text\n\n';
+        } else {
+          allChecked = false;
+        }
+      }
+    }
+    notifyListeners();
+  }
+
   void refreshBuffer() {
-    refreshedBuffer.clear();
+    refreshedBuffer = [];
     copyText = '';
     _renderedBufferWithoutPrefix.clear();
     checked = [];
-    checkedBuffer.clear();
+    allChecked = false;
     notifyListeners();
   }
 
   void handleExtendLogIconClick(int index) {
-    extended[index] = !extended[index];
+    refreshedBuffer[index].extended = !refreshedBuffer[index].extended;
     notifyListeners();
   }
 
-  void handleCheckboxClick(int index) {
-    checked[index] = !checked[index];
-    if (checked[index]) {
-      checkedBuffer.add(refreshedBuffer[index]);
-    } else {
-      checkedBuffer.removeWhere((element) => element == refreshedBuffer[index]);
-    }
-    checkedBuffer.sort((a, b) => a.id.compareTo(b.id));
-
+  void handleCheckboxClick(int index, bool value) {
+    refreshedBuffer[index].checked = value;
+    allChecked = true;
     copyText = '';
-    if (checkedBuffer.isNotEmpty) {
-      for (var element in checkedBuffer) {
-        copyText += checkedBuffer.last == element
-            ? element.lowerCaseText
-            : '${element.lowerCaseText}\n\n';
+
+    for (var element in refreshedBuffer) {
+      if (element.checked) {
+        var text = element.logEntry.lowerCaseText;
+        copyText += refreshedBuffer.last == element ? text : '$text\n\n';
+      } else {
+        allChecked = false;
       }
     }
 
@@ -202,18 +213,18 @@ class AppLogViewModel with ChangeNotifier {
   }
 
   void handleAllCheckboxClick() {
-    bool allChecked = !checked.contains(false);
-    checked.fillRange(0, checked.length, !allChecked);
+    for (var item in refreshedBuffer) {
+      item.checked = !allChecked;
+    }
 
-    checkedBuffer = [];
+    allChecked = !allChecked;
+
     copyText = '';
-    if (!allChecked) {
-      checkedBuffer.addAll(refreshedBuffer);
-      if (checkedBuffer.isNotEmpty) {
-        for (var element in checkedBuffer) {
-          copyText += checkedBuffer.last == element
-              ? element.lowerCaseText
-              : '${element.lowerCaseText}\n\n';
+    if (allChecked) {
+      for (var element in refreshedBuffer) {
+        if (element.checked) {
+          var text = element.logEntry.lowerCaseText;
+          copyText += refreshedBuffer.last == element ? text : '$text\n\n';
         }
       }
     }
@@ -246,13 +257,6 @@ class AppLogViewModel with ChangeNotifier {
       color!,
       text.toLowerCase(),
     );
-  }
-
-  @override
-  void dispose() {
-    AppLogEvent.removeOutputListener(_callback);
-    AppLogEvent.removeOutputListener(_callbackWithoutPrefix);
-    super.dispose();
   }
 }
 

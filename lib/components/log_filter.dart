@@ -28,7 +28,7 @@ class LogFilter extends StatelessWidget {
             child: TextField(
               style: const TextStyle(fontSize: 20),
               controller: provider.filterController,
-              onChanged: (s) => provider.refreshFilter(),
+              onChanged: (s) => provider.filterControl(),
               decoration: InputDecoration(
                 labelText: logType == 'app log'
                     ? 'Filter $logType output'

@@ -27,9 +27,9 @@ class LogCheckbox extends StatelessWidget {
               (states) => BorderSide(width: 2, color: color),
             ),
             splashRadius: 18,
-            value: provider.checked[index],
+            value: provider.refreshedBuffer[index].checked,
             onChanged: (value) {
-              provider.handleCheckboxClick(index);
+              provider.handleCheckboxClick(index, value);
             }),
       ),
     );
