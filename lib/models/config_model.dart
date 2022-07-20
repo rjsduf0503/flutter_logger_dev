@@ -1,4 +1,4 @@
-import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/enums.dart';
 
 class ConfigModel {
   static List<Level> maxDisplayLevel = [

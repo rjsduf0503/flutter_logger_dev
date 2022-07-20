@@ -1,5 +1,5 @@
 import 'package:flutter_logger/models/config_model.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/enums.dart';
 
 class EnvironmentsModel {
   static Level _config = Level.verbose;

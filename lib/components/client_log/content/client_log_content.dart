@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/components/log_checkbox.dart';
 import 'package:flutter_logger/components/client_log/content/card_header.dart';
 import 'package:flutter_logger/components/client_log/content/detail_button.dart';
+import 'package:flutter_logger/components/log_checkbox.dart';
 import 'package:flutter_logger/routes/routing.dart';
 import 'package:intl/intl.dart';
 

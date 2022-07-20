@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/log_filter.dart';
+import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/environments_model.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
 
 class AppLogFilter extends StatelessWidget {
   final bool dark;

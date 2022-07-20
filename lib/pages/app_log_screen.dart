@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/components/app_log/app_log_filter.dart';
 import 'package:flutter_logger/components/app_log/app_log_contents.dart';
+import 'package:flutter_logger/components/app_log/app_log_filter.dart';
 import 'package:flutter_logger/components/custom_material_app.dart';
 import 'package:flutter_logger/components/log_header.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';

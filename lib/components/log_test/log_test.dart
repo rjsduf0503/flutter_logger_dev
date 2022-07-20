@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/components/log_test/elevated_color_button.dart';
-import 'package:flutter_logger/view_models/app_log_error_view_model.dart';
+import 'package:flutter_logger/components/elevated_color_button.dart';
 import 'package:flutter_logger/components/log_test/center_bold_text.dart';
 import 'package:flutter_logger/flutter_logger.dart';
+import 'package:flutter_logger/view_models/app_log_error_view_model.dart';
 
 class LogTest extends StatelessWidget {
   const LogTest({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/routes/routing.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import '../../routes/routing.dart' as routing;
 
 class Fab extends StatelessWidget {
   final ValueNotifier<bool> isDialOpen;
@@ -24,19 +24,19 @@ class Fab extends StatelessWidget {
             child: const Icon(Icons.wysiwyg),
             label: 'Log',
             onTap: () {
-              routing.handleRouting(context, 'Log');
+              handleRouting(context, 'Log');
             }),
         SpeedDialChild(
             child: const Icon(Icons.last_page_outlined),
             label: 'App Log',
             onTap: () {
-              routing.handleRouting(context, 'App Log');
+              handleRouting(context, 'App Log');
             }),
         SpeedDialChild(
             child: const Icon(Icons.public),
             label: 'Client Log',
             onTap: () {
-              routing.handleRouting(context, 'Client Log');
+              handleRouting(context, 'Client Log');
             }),
       ],
     );

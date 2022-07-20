@@ -3,7 +3,7 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/global_functions.dart';
 import 'package:flutter_logger/models/checked_log_entry_model.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart' as applog;

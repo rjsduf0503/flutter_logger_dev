@@ -209,6 +209,8 @@ class ClientLogEvent {
 }
 
 class ClientLogInterceptor extends Interceptor {
+  late DateTime requestTime;
+  late RequestOptions reqOptions;
   var debugPrint = (String? message,
           {int? wrapWidth, String? currentState, dynamic time}) =>
       debugPrintSynchronouslyWithText(
@@ -221,22 +223,9 @@ class ClientLogInterceptor extends Interceptor {
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     requestTime = DateTime.now().toLocal();
-    // debugPrint('     ===== Dio Error [Start] =====',
-    //     currentState: 'Error', time: reqTime);
-    // debugPrint('     method => ${options.method}',
-    //     currentState: 'Error', time: reqTime);
-    // debugPrint('     uri => ${options.uri}',
-    //     currentState: 'Error', time: reqTime);
-    // debugPrint('     requestHeader => ${options.headers}',
-    //     currentState: 'Error', time: reqTime);
-    // debugPrint('     requestBody => ${options.data}',
-    //     currentState: 'Error', time: reqTime);
     reqOptions = options;
     return super.onRequest(options, handler);
   }
-
-  late DateTime requestTime;
-  late RequestOptions reqOptions;
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
