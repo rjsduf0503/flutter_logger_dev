@@ -18,14 +18,10 @@ class CustomMaterialApp extends StatelessWidget {
       theme: dark
           ? ThemeData(
               brightness: Brightness.dark,
-              // colorScheme:
-              //     ColorScheme.fromSwatch().copyWith(secondary: Colors.white),
               accentColor: Colors.white,
             )
           : ThemeData(
               brightness: Brightness.light,
-              // colorScheme:
-              // ColorScheme.fromSwatch().copyWith(secondary: Colors.black),
               accentColor: Colors.black,
             ),
       home: Scaffold(

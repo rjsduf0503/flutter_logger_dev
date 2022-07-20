@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/components/log_checkbox.dart';
 import 'package:flutter_logger/components/app_log/app_log_extend_button.dart';
+import 'package:flutter_logger/components/log_checkbox.dart';
 
 class AppLogContents extends StatelessWidget {
   final bool dark;

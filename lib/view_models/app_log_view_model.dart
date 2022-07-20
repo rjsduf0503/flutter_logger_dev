@@ -4,7 +4,7 @@ import 'dart:developer' as developer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/models/checked_log_entry_model.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/environments_model.dart';
 import 'package:flutter_logger/models/log_event_model.dart';
 import 'package:flutter_logger/models/log_printer_model.dart';

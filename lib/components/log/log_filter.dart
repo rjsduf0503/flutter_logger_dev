@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/components/elevated_color_button.dart';
 import 'package:flutter_logger/components/log_bar.dart';
-import 'package:flutter_logger/components/log_test/elevated_color_button.dart';
 
 class LogFilter extends StatelessWidget {
   final bool dark;

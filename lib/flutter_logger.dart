@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/environments_model.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
 import 'package:flutter_logger/pages/home_screen.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';

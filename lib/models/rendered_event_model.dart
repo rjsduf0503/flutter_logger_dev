@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_logger/models/enums/enums.dart';
+import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/http_request_model.dart';
 
 class RenderedClientLogEventModel {
