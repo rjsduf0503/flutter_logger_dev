@@ -3,10 +3,11 @@ import 'package:flutter_logger/components/client_log/content/client_log_content.
 
 class ClientLogContents extends StatelessWidget {
   final dynamic provider;
-  ClientLogContents({Key? key, required this.provider}) : super(key: key);
+  const ClientLogContents({Key? key, required this.provider}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var buffer = provider.refreshedBuffer;
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: ListView.builder(
@@ -15,9 +16,9 @@ class ClientLogContents extends StatelessWidget {
           return ClientLogContent(
               provider: provider,
               index: index,
-              logEntry: provider.refreshedBuffer[index].logEntry);
+              logEntry: buffer[index].logEntry);
         },
-        itemCount: provider.refreshedBuffer.length,
+        itemCount: buffer.length,
       ),
     );
   }

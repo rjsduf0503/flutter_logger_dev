@@ -48,6 +48,7 @@ class ClientLogViewModel with ChangeNotifier {
   List<CheckedLogEntryModel> checked = [];
 
   void initState() {
+    // Add events to buffer
     _callback = (event) {
       if (_renderedBuffer.length == _bufferSize) {
         _renderedBuffer.removeFirst();
@@ -56,6 +57,7 @@ class ClientLogViewModel with ChangeNotifier {
       refreshFilter();
     };
 
+    // Add event listener
     ClientLogEvent.addOutputListener(_callback);
 
     checked = List<CheckedLogEntryModel>.generate(
@@ -91,12 +93,14 @@ class ClientLogViewModel with ChangeNotifier {
     refreshFilter();
   }
 
+  // Remove event listener
   @override
   void dispose() {
     ClientLogEvent.removeOutputListener(_callback);
     super.dispose();
   }
 
+  // Handle event
   RenderedClientLogEventModel _renderEvent(HttpModel value) {
     return RenderedClientLogEventModel(
       _currentId++,
@@ -106,6 +110,7 @@ class ClientLogViewModel with ChangeNotifier {
     );
   }
 
+  // Get buffer by filtering
   List getFilteredBuffer(List list) {
     return list.where((it) {
       if (filterController.text.isNotEmpty) {
@@ -123,6 +128,7 @@ class ClientLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle buffer by filter controlling
   void filterControl() {
     refreshFilter();
     allChecked = true;
@@ -143,6 +149,7 @@ class ClientLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Temporary refresh buffer
   void refreshBuffer() {
     refreshedBuffer = [];
     copyText = '';
@@ -152,6 +159,7 @@ class ClientLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle single checkbox button click
   void handleCheckboxClick(int index, bool value) {
     refreshedBuffer[index].checked = value;
     allChecked = true;
@@ -170,6 +178,7 @@ class ClientLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle entire checkbox button click
   void handleAllCheckboxClick() {
     for (var item in refreshedBuffer) {
       item.checked = !allChecked;
@@ -208,6 +217,8 @@ class ClientLogEvent {
   static Set<OutputCallback> get getOutputCallbacks => _outputCallbacks;
 }
 
+// Custom dio [Interceptor]
+// Showing [response], [request], [error] message by using [debugPrint]
 class ClientLogInterceptor extends Interceptor {
   late DateTime requestTime;
   late RequestOptions reqOptions;
@@ -275,7 +286,6 @@ class ClientLogInterceptor extends Interceptor {
 }
 
 BaseOptions baseOptions = BaseOptions(
-  baseUrl: "https://reqres.in/api",
   connectTimeout: 10000,
   receiveTimeout: 10000,
   followRedirects: false,
@@ -284,6 +294,7 @@ BaseOptions baseOptions = BaseOptions(
   },
 );
 
+// Handle client log
 class ClientLogger {
   void get(
     String url, {
@@ -400,18 +411,20 @@ class ClientLogger {
             connectTimeout: timeout,
             receiveTimeout: timeout,
           );
+    // Adding [intercepter] to our [Dio] model
     final dio = Dio(dioOptions)
       ..interceptors.add(
         ClientLogInterceptor(),
       );
     DateTime requestTime = DateTime.now().toLocal();
     var request = HttpRequestModel(
-        requestTime,
-        dio.options.method,
-        dio.options.baseUrl + url,
-        dio.options.queryParameters,
-        dio.options.headers,
-        data);
+      requestTime,
+      dio.options.method,
+      dio.options.baseUrl + url,
+      dio.options.queryParameters,
+      dio.options.headers,
+      data,
+    );
     try {
       Response response = await dio.request(
         url,
@@ -423,20 +436,29 @@ class ClientLogger {
       );
       DateTime responseTime = DateTime.now().toLocal();
       response.headers['date']?[0] = responseTime.toString();
-      var returnValue = HttpModel(request, response);
+
+      var httpModel = HttpModel(request, response);
       Set<OutputCallback> outputCallbacks = ClientLogEvent.getOutputCallbacks;
+
+      // For showing in app
       for (var callback in outputCallbacks) {
-        callback(returnValue);
+        callback(httpModel);
       }
-    } on DioError catch (error) {
-      var returnValue =
+    }
+    // Dio Error handling
+    on DioError catch (error) {
+      var httpModel =
           HttpModel(request, error.response, errorType: error.type.name);
       Set<OutputCallback> outputCallbacks = ClientLogEvent.getOutputCallbacks;
+
+      // For showing in app
       for (var callback in outputCallbacks) {
-        callback(returnValue);
+        callback(httpModel);
       }
-    } on Error catch (error) {
-      print(error);
+    }
+    // Other Error handling
+    on Error catch (error) {
+      debugPrint(error as String);
     }
   }
 }

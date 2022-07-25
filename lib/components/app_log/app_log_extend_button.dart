@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/global_functions.dart';
 
 class AppLogExtendButton extends StatelessWidget {
   final dynamic provider;
+  final bool dark;
   final int index;
 
   const AppLogExtendButton(
-      {Key? key, required this.provider, required this.index})
+      {Key? key,
+      required this.provider,
+      required this.dark,
+      required this.index})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var temp = provider.refreshedBuffer[index];
+    Color? color = getLevelColorsInApp(temp.logEntry.level, dark);
     return Positioned(
       right: 2,
       top: -1,
@@ -17,12 +24,9 @@ class AppLogExtendButton extends StatelessWidget {
         onTap: (() {
           provider.handleExtendLogIconClick(index);
         }),
-        child: provider.refreshedBuffer[index].extended
-            ? Icon(Icons.remove,
-                color: provider.refreshedBuffer[index].logEntry.color, size: 32)
-            : Icon(Icons.add,
-                color: provider.refreshedBuffer[index].logEntry.color,
-                size: 32),
+        child: temp.extended
+            ? Icon(Icons.remove, color: color, size: 32)
+            : Icon(Icons.add, color: color, size: 32),
       ),
     );
   }

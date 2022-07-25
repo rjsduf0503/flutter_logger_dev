@@ -10,10 +10,10 @@ class ClientLogScreen extends StatefulWidget {
   const ClientLogScreen({Key? key}) : super(key: key);
 
   @override
-  _ClientLogScreenState createState() => _ClientLogScreenState();
+  ClientLogScreenState createState() => ClientLogScreenState();
 }
 
-class _ClientLogScreenState extends State<ClientLogScreen>
+class ClientLogScreenState extends State<ClientLogScreen>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -38,8 +38,7 @@ class _ClientLogScreenState extends State<ClientLogScreen>
 
   @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool dark = brightness == Brightness.dark;
+    bool dark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Consumer<ClientLogViewModel>(
       builder: (context, provider, child) {
         return CustomMaterialApp(

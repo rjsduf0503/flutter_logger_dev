@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 class LogScreen extends StatefulWidget {
   const LogScreen({Key? key}) : super(key: key);
 
+  @override
   LogScreenState createState() => LogScreenState();
 }
 
@@ -34,9 +35,7 @@ class LogScreenState extends State<LogScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool dark = brightness == Brightness.dark;
-
+    bool dark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Consumer<LogViewModel>(
       builder: (context, provider, child) {
         return CustomMaterialApp(

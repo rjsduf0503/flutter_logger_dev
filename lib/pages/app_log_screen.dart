@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 class AppLogScreen extends StatefulWidget {
   const AppLogScreen({Key? key}) : super(key: key);
 
+  @override
   AppLogScreenState createState() => AppLogScreenState();
 }
 
@@ -28,36 +29,12 @@ class AppLogScreenState extends State<AppLogScreen>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    WidgetsBinding.instance.removeObserver(this);
-  }
-
-  @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool dark = brightness == Brightness.dark;
-
+    bool dark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     return Consumer<AppLogViewModel>(
       builder: (context, provider, child) {
         return CustomMaterialApp(
           dark: dark,
-          fab: AnimatedOpacity(
-            opacity: provider.followBottom ? 0 : 1,
-            duration: const Duration(milliseconds: 150),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 60),
-              child: FloatingActionButton(
-                mini: true,
-                clipBehavior: Clip.antiAlias,
-                onPressed: provider.scrollToBottom,
-                child: Icon(
-                  Icons.arrow_downward,
-                  color: dark ? Colors.black : Colors.white,
-                ),
-              ),
-            ),
-          ),
           child: Column(
             children: <Widget>[
               LogHeader(

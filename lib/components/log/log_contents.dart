@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/client_log/content/client_log_content.dart';
 import 'package:flutter_logger/components/log_checkbox.dart';
+import 'package:flutter_logger/global_functions.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
 
 class LogContents extends StatelessWidget {
   final bool dark;
   final dynamic provider;
 
-  const LogContents({Key? key, required this.dark, this.provider})
-      : super(key: key);
+  const LogContents({
+    Key? key,
+    this.provider,
+    required this.dark,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var buffer = provider.refreshedBuffer;
     return Container(
       decoration: BoxDecoration(
-        color: dark ? Colors.black : Colors.grey[150],
+        color: dark ? const Color.fromARGB(255, 22, 22, 22) : Colors.grey[150],
       ),
       child: ListView.builder(
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          var logEntry = provider.refreshedBuffer[index].logEntry;
+          var logEntry = buffer[index].logEntry;
           if (logEntry.runtimeType == RenderedAppLogEventModel) {
+            Color? color = getLevelColorsInApp(logEntry.level, dark);
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -29,7 +35,7 @@ class LogContents extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: logEntry.color,
+                      color: color!,
                       width: 2,
                     ),
                     borderRadius: BorderRadius.circular(15),
@@ -48,7 +54,7 @@ class LogContents extends StatelessWidget {
                                     .last
                                     .toUpperCase(),
                                 style: TextStyle(
-                                  color: logEntry.color,
+                                  color: color,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
@@ -61,7 +67,7 @@ class LogContents extends StatelessWidget {
                               Text(
                                 logEntry.lowerCaseText,
                                 style: TextStyle(
-                                  color: logEntry.color,
+                                  color: color,
                                   fontSize: 15,
                                 ),
                               ),
@@ -73,7 +79,7 @@ class LogContents extends StatelessWidget {
                         provider: provider,
                         index: index,
                         position: const [-5, -10],
-                        color: logEntry.color,
+                        color: color,
                       ),
                     ],
                   ),
@@ -82,12 +88,10 @@ class LogContents extends StatelessWidget {
             );
           } else {
             return ClientLogContent(
-                provider: provider,
-                index: index,
-                logEntry: provider.refreshedBuffer[index].logEntry);
+                provider: provider, index: index, logEntry: logEntry);
           }
         },
-        itemCount: provider.refreshedBuffer.length,
+        itemCount: buffer.length,
       ),
     );
   }

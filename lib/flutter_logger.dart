@@ -1,21 +1,45 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/components/flutter_logger_overlay.dart';
 import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/environments_model.dart';
-import 'package:flutter_logger/pages/home_screen.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart';
 import 'package:flutter_logger/view_models/client_log_view_model.dart';
 import 'package:flutter_logger/view_models/log_view_model.dart';
-import 'package:provider/provider.dart';
 
 AppLogger appLogger = AppLogger();
 ClientLogger clientLogger = ClientLogger();
 
-class FlutterLogger extends StatelessWidget {
+class FlutterLogger extends StatefulWidget {
   const FlutterLogger({Key? key}) : super(key: key);
 
   @override
+  FlutterLoggerState createState() => FlutterLoggerState();
+}
+
+class FlutterLoggerState extends State<FlutterLogger> {
+  // Initialize overlay
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FlutterLoggerOverlay.setOverlay = context;
+      FlutterLoggerOverlay.insertOverlay();
+    });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    //Initialize view models
+    AppLogViewModel.init();
+    ClientLogViewModel.init();
+    LogViewModel.init();
+
+    // For error handling
+    // You can change case by exception runtimeType by editting this function
     FlutterError.onError = (FlutterErrorDetails details) {
       final dynamic exception = details.exception;
 
@@ -58,6 +82,7 @@ class FlutterLogger extends StatelessWidget {
       }
     };
 
+    // Check development environments
     if (kDebugMode) {
       EnvironmentsModel.setEnvironment(Environment.debug);
     } else if (kProfileMode) {
@@ -66,32 +91,6 @@ class FlutterLogger extends StatelessWidget {
       EnvironmentsModel.setEnvironment(Environment.release);
     }
 
-    AppLogViewModel.init();
-    ClientLogViewModel.init();
-    LogViewModel.init();
-
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<AppLogViewModel>(
-          create: (_) => AppLogViewModel(),
-        ),
-        ChangeNotifierProvider<ClientLogViewModel>(
-          create: (_) => ClientLogViewModel(),
-        ),
-        ChangeNotifierProvider<LogViewModel>(
-          create: (_) => LogViewModel(),
-        ),
-      ],
-      child: MaterialApp(
-        title: 'Flutter Logger',
-        theme: ThemeData(
-          colorScheme: const ColorScheme.light(
-            brightness: Brightness.light,
-            secondary: Colors.black,
-          ),
-        ),
-        home: HomeScreen(),
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }

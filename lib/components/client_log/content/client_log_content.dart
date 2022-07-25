@@ -9,7 +9,7 @@ class ClientLogContent extends StatelessWidget {
   final dynamic logEntry;
   final dynamic provider;
   final int index;
-  ClientLogContent(
+  const ClientLogContent(
       {Key? key,
       required this.logEntry,
       required this.provider,

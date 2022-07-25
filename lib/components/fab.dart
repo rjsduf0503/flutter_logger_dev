@@ -3,16 +3,16 @@ import 'package:flutter_logger/routes/routing.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class Fab extends StatelessWidget {
-  final ValueNotifier<bool> isDialOpen;
-
-  const Fab({Key? key, required this.isDialOpen}) : super(key: key);
+  const Fab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size.width * 0.15;
+
     return SpeedDial(
       icon: Icons.add,
       activeIcon: Icons.close,
-      openCloseDial: isDialOpen,
+      buttonSize: Size(size, size),
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
       overlayColor: Colors.grey,

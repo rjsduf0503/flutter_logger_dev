@@ -8,21 +8,21 @@ import 'package:flutter_logger/global_functions.dart';
 class ClientLogDetailScreen extends StatelessWidget {
   final dynamic logEntry;
 
-  ClientLogDetailScreen({Key? key, required this.logEntry}) : super(key: key);
+  const ClientLogDetailScreen({Key? key, required this.logEntry})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var brightness = MediaQuery.of(context).platformBrightness;
-    bool dark = brightness == Brightness.dark;
     String stringHttp = stringfyHttp(logEntry, errorType: logEntry.errorType);
+    bool dark = MediaQuery.of(context).platformBrightness == Brightness.dark;
     return CustomMaterialApp(
       dark: dark,
       child: ListView(
         shrinkWrap: true,
         children: <Widget>[
           LogHeader(
-            dark: dark,
             parentContext: context,
+            dark: dark,
             consoleType: 'Client Log Detail',
             stringHttp: stringHttp,
           ),

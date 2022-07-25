@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_logger/components/flutter_logger_overlay.dart';
 import 'package:flutter_logger/components/log_bar.dart';
 import 'package:flutter_logger/global_functions.dart';
 
 class LogHeader extends StatelessWidget {
-  final bool dark;
   final dynamic parentContext;
   final String consoleType;
   final dynamic provider;
   final dynamic stringHttp;
+  final bool dark;
 
   const LogHeader({
     Key? key,
-    this.dark = false,
+    required this.dark,
     required this.parentContext,
     required this.consoleType,
     this.provider,
@@ -82,6 +83,9 @@ class LogHeader extends StatelessWidget {
             splashRadius: 20,
             icon: const Icon(Icons.close, size: 32),
             onPressed: () {
+              if (!identical(consoleType, 'Client Log Detail')) {
+                FlutterLoggerOverlay.insertOverlay();
+              }
               Navigator.pop(parentContext);
             },
           ),
