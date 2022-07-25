@@ -6,10 +6,9 @@ import 'package:flutter_logger/models/environments_model.dart';
 class AppLogFilter extends StatelessWidget {
   final bool dark;
   final dynamic provider;
-  AppLogFilter({
+  const AppLogFilter({
     Key? key,
-    required this.dark,
-    required this.provider,
+    required this.provider, required this.dark,
   }) : super(key: key);
 
   @override

@@ -5,11 +5,12 @@ import 'package:flutter_logger/components/log_bar.dart';
 class LogFilter extends StatelessWidget {
   final bool dark;
   final dynamic provider;
-  const LogFilter({Key? key, required this.dark, required this.provider})
+  const LogFilter({Key? key, required this.provider, required this.dark})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // dark = WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
     Color textColor = dark ? Colors.grey.shade100 : Colors.black87;
     Color buttonColor = dark ? Colors.white12 : Colors.grey.shade200;
     return LogBar(

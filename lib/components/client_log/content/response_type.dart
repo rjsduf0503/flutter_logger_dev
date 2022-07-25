@@ -13,7 +13,7 @@ List<Color> _statusCodeColor = [
 class ResponseType extends StatelessWidget {
   final dynamic responseType;
 
-  ResponseType({Key? key, required this.responseType}) : super(key: key);
+  const ResponseType({Key? key, required this.responseType}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

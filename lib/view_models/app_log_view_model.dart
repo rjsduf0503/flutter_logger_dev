@@ -16,7 +16,7 @@ int _bufferSize = 100;
 bool _initialized = false;
 var _currentId = 0;
 
-class AppLogViewModel with ChangeNotifier {
+class AppLogViewModel with ChangeNotifier, WidgetsBindingObserver {
   static final AppLogViewModel _appLogConsoleViewModel =
       AppLogViewModel._internal();
   factory AppLogViewModel() => _appLogConsoleViewModel;
@@ -45,8 +45,7 @@ class AppLogViewModel with ChangeNotifier {
   List filteredBufferWithoutPrefix = [];
   List refreshedBuffer = [];
 
-  final filterController = TextEditingController();
-  final scrollController = ScrollController();
+  TextEditingController filterController = TextEditingController();
   bool allChecked = false;
 
   String copyText = '';
@@ -55,22 +54,8 @@ class AppLogViewModel with ChangeNotifier {
   Level filterLevel = Level.nothing;
   late List<Level> currentLevels = [];
 
-  bool _scrollListenerEnabled = true;
-  bool followBottom = true;
-
-  static final bool dark =
-      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
-
-  final levelColorsInApp = {
-    Level.info: dark ? Colors.lightBlue[300] : Colors.indigo[700],
-    Level.warning: dark ? Colors.orange[300] : Colors.orange[700],
-    Level.error: dark ? Colors.red[300] : Colors.red[700],
-    Level.debug: dark ? Colors.lightGreen[300] : Colors.lightGreen[700],
-    Level.verbose: dark ? Colors.grey[600] : Colors.grey[700],
-    Level.nothing: dark ? Colors.white : Colors.black,
-  };
-
   void initState() {
+    // Add events to buffer
     _callbackWithoutPrefix = (event) {
       if (_renderedBufferWithoutPrefix.length == _bufferSize) {
         _renderedBufferWithoutPrefix.removeFirst();
@@ -80,18 +65,10 @@ class AppLogViewModel with ChangeNotifier {
       refreshFilter();
     };
 
+    // Add event listener
     AppLogEvent.addOutputListener(_callbackWithoutPrefix);
 
-    scrollController.addListener(() {
-      if (!_scrollListenerEnabled) return;
-      var scrolledToBottom =
-          scrollController.offset >= scrollController.position.maxScrollExtent;
-
-      followBottom = scrolledToBottom;
-      notifyListeners();
-    });
     currentLevels = [];
-
     checked = List<CheckedAndExtendedLogEntryModel>.generate(
         _renderedBufferWithoutPrefix.length,
         (index) => CheckedAndExtendedLogEntryModel());
@@ -131,12 +108,14 @@ class AppLogViewModel with ChangeNotifier {
     refreshFilter();
   }
 
+  // Remove event listener
   @override
   void dispose() {
     AppLogEvent.removeOutputListener(_callbackWithoutPrefix);
     super.dispose();
   }
 
+  // Get buffer by filtering
   List getFilteredBuffer(List list) {
     return list.where((it) {
       var logLevelMatches = filterLevel.name == 'nothing'
@@ -156,12 +135,9 @@ class AppLogViewModel with ChangeNotifier {
   void refreshFilter() {
     filteredBufferWithoutPrefix = getFilteredBuffer(checked);
     refreshedBuffer = filteredBufferWithoutPrefix;
-
-    if (followBottom) {
-      Future.delayed(Duration.zero, scrollToBottom);
-    }
   }
 
+  // Handle buffer by filter controlling
   void filterControl() {
     refreshFilter();
     allChecked = true;
@@ -181,6 +157,7 @@ class AppLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Temporary refresh buffer
   void refreshBuffer() {
     refreshedBuffer = [];
     copyText = '';
@@ -190,11 +167,13 @@ class AppLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle single extend button click
   void handleExtendLogIconClick(int index) {
     refreshedBuffer[index].extended = !refreshedBuffer[index].extended;
     notifyListeners();
   }
 
+  // Handle single checkbox button click
   void handleCheckboxClick(int index, bool value) {
     refreshedBuffer[index].checked = value;
     allChecked = true;
@@ -212,6 +191,7 @@ class AppLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle entire checkbox button click
   void handleAllCheckboxClick() {
     for (var item in refreshedBuffer) {
       item.checked = !allChecked;
@@ -232,34 +212,18 @@ class AppLogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void scrollToBottom() async {
-    _scrollListenerEnabled = false;
-
-    followBottom = true;
-
-    var scrollPosition = scrollController.position;
-    await scrollController.animateTo(
-      scrollPosition.maxScrollExtent,
-      duration: const Duration(milliseconds: 400),
-      curve: Curves.easeOut,
-    );
-
-    _scrollListenerEnabled = true;
-    notifyListeners();
-  }
-
+  // Handle event
   RenderedAppLogEventModel _renderEvent(OutputEventModel event) {
-    Color? color = levelColorsInApp[event.level];
     var text = event.lines.join('\n');
     return RenderedAppLogEventModel(
       _currentId++,
       event.level,
-      color!,
       text.toLowerCase(),
     );
   }
 }
 
+// Handle app log
 class AppLogger {
   static Level level = Level.nothing;
   final LogPrinterModel _printer;
@@ -305,9 +269,13 @@ class AppLogger {
     } else if (level == Level.nothing) {
       throw ArgumentError('Log events cannot have Level.nothing');
     }
+    // Log-level handling by development environments
     if (level.index > EnvironmentsModel.getMaxDisplayLevel.index) return;
     var logEvent = LogEventModel(level, message, error, stackTrace);
+
+    // For debug console log
     List<String> output = _printer.log(logEvent, false);
+
     List<String> outputWithoutPrefix = _printer.log(logEvent, true);
     Set<OutputCallbackWithoutPrefix> outputCallbackWithoutPrefix =
         AppLogEvent.getOutputCallbacksWithoutPrefix;
@@ -315,17 +283,21 @@ class AppLogger {
     if (outputWithoutPrefix.isNotEmpty) {
       var outputEventWithoutPrefix =
           OutputEventModel(level, outputWithoutPrefix);
+
+      // For showing in app
       for (var callback in outputCallbackWithoutPrefix) {
         callback(outputEventWithoutPrefix);
       }
+
+      // For debug console log
       if (output.isNotEmpty) {
         try {
           for (var item in output) {
             developer.log(item);
           }
         } catch (e, s) {
-          print(e);
-          print(s);
+          debugPrint(e as String);
+          debugPrint(s as String);
         }
       }
     }
@@ -333,7 +305,6 @@ class AppLogger {
 
   void close() {
     _active = false;
-    _printer.destroy();
   }
 }
 
@@ -599,6 +570,7 @@ class LogPrinter extends LogPrinterModel {
     }
   }
 
+  // Coloring print message by log level
   List<String> _formatAndPrint(
     Level level,
     String message,

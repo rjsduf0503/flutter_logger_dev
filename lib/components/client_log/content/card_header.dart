@@ -5,9 +5,9 @@ import 'package:flutter_logger/global_functions.dart';
 class CardHeader extends StatelessWidget {
   final String requestTime;
   final dynamic responseType;
-  String requestMethod;
+  final String requestMethod;
   final dynamic timeDifference;
-  CardHeader(
+  const CardHeader(
       {Key? key,
       required this.requestTime,
       required this.responseType,

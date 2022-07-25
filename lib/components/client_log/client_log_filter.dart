@@ -4,10 +4,10 @@ import 'package:flutter_logger/components/log_filter.dart';
 class ClientLogFilter extends StatelessWidget {
   final bool dark;
   final dynamic provider;
-  ClientLogFilter({
+  const ClientLogFilter({
     Key? key,
-    required this.dark,
     required this.provider,
+    required this.dark,
   }) : super(key: key);
 
   @override

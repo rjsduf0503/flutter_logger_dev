@@ -1,5 +1,8 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logger/models/enums.dart';
 
 String getTimeDifference(time) {
   if (time == '') return time;
@@ -49,6 +52,7 @@ String stringfyHttp(value, {errorType}) {
     var responsePrefix = '[$statusMessage] - [$responseTime]:     ';
     str.add(
         '$responsePrefix responseStatus => ${value.response.statusCode.toString()}');
+    // You can change responseCorrelationId by yours
     str.add(
         '$responsePrefix responseCorrelationId => a7aa5198-8bb3-40f3-aa30-0c0889a02222');
     str.add('$responsePrefix responseBody => ${value.response.data}');
@@ -72,4 +76,17 @@ bool isInt(String str) {
     return false;
   }
   return int.tryParse(str) != null;
+}
+
+Color? getLevelColorsInApp(Level level, bool dark) {
+  Map<Level, Color> levelColorsInApp = {
+    Level.info: dark ? Colors.lightBlue.shade300 : Colors.indigo.shade700,
+    Level.warning: dark ? Colors.orange.shade300 : Colors.orange.shade700,
+    Level.error: dark ? Colors.red.shade300 : Colors.red.shade700,
+    Level.debug: dark ? Colors.lightGreen.shade300 : Colors.lightGreen.shade700,
+    Level.verbose: dark ? Colors.grey.shade600 : Colors.grey.shade700,
+    Level.nothing: dark ? Colors.white : Colors.black,
+  };
+
+  return levelColorsInApp[level];
 }

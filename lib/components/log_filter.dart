@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_logger/components/log_bar.dart';
 
 class LogFilter extends StatelessWidget {
-  final bool dark;
   final dynamic provider;
   final Widget padding;
   final Widget levelFiltering;
   final String logType;
+  final bool dark;
 
   const LogFilter({
     Key? key,
-    required this.dark,
     required this.provider,
     this.padding = const SizedBox.shrink(),
     this.levelFiltering = const SizedBox.shrink(),
     required this.logType,
+    required this.dark,
   }) : super(key: key);
 
   @override

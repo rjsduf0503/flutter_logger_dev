@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 
 class ResponseCard extends StatelessWidget {
   final dynamic response;
-  ResponseCard({Key? key, required this.response}) : super(key: key);
+  const ResponseCard({Key? key, required this.response}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +52,3 @@ class ResponseCard extends StatelessWidget {
     );
   }
 }
-
-
-      // response.extra
-      // response.requestOptions
-      // response.statusCode
-      //response.statusMessage

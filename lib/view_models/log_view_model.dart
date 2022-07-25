@@ -3,7 +3,6 @@ import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_logger/global_functions.dart';
 import 'package:flutter_logger/models/checked_log_entry_model.dart';
-import 'package:flutter_logger/models/enums.dart';
 import 'package:flutter_logger/models/output_event_model.dart';
 import 'package:flutter_logger/models/rendered_event_model.dart';
 import 'package:flutter_logger/view_models/app_log_view_model.dart' as applog;
@@ -43,18 +42,6 @@ class LogViewModel with ChangeNotifier {
     });
   }
 
-  static final bool dark =
-      WidgetsBinding.instance.window.platformBrightness == Brightness.dark;
-
-  final levelColorsInApp = {
-    Level.info: dark ? Colors.lightBlue[300] : Colors.indigo[700],
-    Level.warning: dark ? Colors.orange[300] : Colors.orange[700],
-    Level.error: dark ? Colors.red[300] : Colors.red[700],
-    Level.debug: dark ? Colors.lightGreen[300] : Colors.lightGreen[700],
-    Level.verbose: dark ? Colors.grey[600] : Colors.grey[700],
-    Level.nothing: dark ? Colors.white : Colors.black,
-  };
-
   late applog.OutputCallbackWithoutPrefix _appLogCallback;
   late clientlog.OutputCallback _clientLogCallback;
 
@@ -69,6 +56,7 @@ class LogViewModel with ChangeNotifier {
   List<CheckedLogEntryModel> checked = [];
 
   void initState() {
+    // Add events to buffers
     _appLogCallback = (event) {
       if (_renderedBuffer.length == _bufferSize) {
         _renderedBuffer.removeFirst();
@@ -86,6 +74,7 @@ class LogViewModel with ChangeNotifier {
       refreshFilter();
     };
 
+    // Add event listeners
     clientlog.ClientLogEvent.addOutputListener(_clientLogCallback);
     applog.AppLogEvent.addOutputListener(_appLogCallback);
 
@@ -120,6 +109,7 @@ class LogViewModel with ChangeNotifier {
     refreshFilter();
   }
 
+  // Remove event listeners
   @override
   void dispose() {
     applog.AppLogEvent.removeOutputListener(_appLogCallback);
@@ -127,14 +117,13 @@ class LogViewModel with ChangeNotifier {
     super.dispose();
   }
 
+  // Handle event
   dynamic _renderEvent(event) {
     if (event.runtimeType == OutputEventModel) {
-      Color? color = levelColorsInApp[event.level];
       var text = event.lines.join('\n');
       return RenderedAppLogEventModel(
         _currentId++,
         event.level,
-        color!,
         text.toLowerCase(),
       );
     } else {
@@ -147,6 +136,7 @@ class LogViewModel with ChangeNotifier {
     }
   }
 
+  // Get buffer by filtering
   List getFilteredBuffer(List list) {
     return list.where((it) {
       if (filterController.text.isNotEmpty) {
@@ -163,6 +153,7 @@ class LogViewModel with ChangeNotifier {
     refreshedBuffer = filteredBuffer;
   }
 
+  // Handle buffer by filter controlling
   void filterControl() {
     refreshFilter();
     allChecked = true;
@@ -188,6 +179,7 @@ class LogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Temporary refresh buffer
   void refreshBuffer() {
     refreshedBuffer = [];
     copyText = '';
@@ -197,6 +189,7 @@ class LogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle single checkbox button click
   void handleCheckboxClick(int index, bool value) {
     refreshedBuffer[index].checked = value;
 
@@ -224,6 +217,7 @@ class LogViewModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Handle entire checkbox button click
   void handleAllCheckboxClick() {
     for (var item in refreshedBuffer) {
       item.checked = !allChecked;

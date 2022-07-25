@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 
 class RequestCard extends StatelessWidget {
   final dynamic request;
-  RequestCard({Key? key, this.request}) : super(key: key);
+  const RequestCard({Key? key, this.request}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
